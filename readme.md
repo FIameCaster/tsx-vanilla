@@ -4,7 +4,7 @@ Create DOM elements using JSX with excellent TypeScript support
 
 ## Installation
 
-	npm install tsx-vanilla
+  npm install tsx-vanilla
 
 ## Setup
 
@@ -51,24 +51,24 @@ import { element, fragment } from "tsx-vanilla"
 
 // Functional components work as you'd expect
 const Counter = (props: { start?: number }) => {
-	let count = props.start || 0
-	return <>
-		<h2>Counter</h2>
-		<button
-			className="btn"
-			onclick={function() {
-				this.textContent = `count: ${++count}`
-		}}>
-			count: {count}
-		</button>
-	</>
+  let count = props.start || 0
+  return <>
+    <h2>Counter</h2>
+    <button
+      className="btn"
+      onclick={function() {
+        this.textContent = `count: ${++count}`
+    }}>
+      count: {count}
+    </button>
+  </>
 }
 
 // JSX expressions return DOM elements that can be appended directly to the DOM
 document.body.append(
-	<h1>tsx-vanilla</h1>,
-	<Counter />,
-	<Counter start={2} />
+  <h1>tsx-vanilla</h1>,
+  <Counter />,
+  <Counter start={2} />
 )
 ```
 
@@ -89,10 +89,10 @@ This is the case for most attributes, but not
 ```jsx
 <h1 style="color: blue;">Blue text</h1>
 <p style={{
-	backgroundColor: "#eee",
-	borderRadius: "0.5em",
-	"--custom-property": "1em"
-	padding: "var(--custom-property)",
+  backgroundColor: "#eee",
+  borderRadius: "0.5em",
+  "--custom-property": "1em"
+  padding: "var(--custom-property)",
 }}>This is a styled paragraph.</p>
 ```
 
@@ -143,9 +143,9 @@ All non-deprecated SVG elements except for those with the same name as an HTML e
 
 ```jsx
 <svg attributes={{ viewBox: '0 0 5 4', width: 200, height: 160 }}>
-	<circle attributes={{
-		r: 1, cx: 2, cy: 2, fill: "blue", stroke: "black", "stroke-width": 0.1
-	}} />
+  <circle attributes={{
+    r: 1, cx: 2, cy: 2, fill: "blue", stroke: "black", "stroke-width": 0.1
+  }} />
 </svg>
 ```
 
@@ -155,22 +155,22 @@ If you need to use non-supported SVG elements, you can include a function like t
 import { element, appendChildren } from "tsx-vanilla"
 
 function createSVGComponent(tagName: string) {
-	return ({ children, ...attributes }: { children: JSX.Child | JSX.Children, [key: string]: any }) => {
-		const el = document.createElementNS('http://www.w3.org/2000/svg', tagName)
-		if (children) appendChildren([children], el)
-		for (const attr in attributes) el.setAttribute(attr, attributes[attr])
-		return el
-	}
+  return ({ children, ...attributes }: { children: JSX.Child | JSX.Children, [key: string]: any }) => {
+    const el = document.createElementNS('http://www.w3.org/2000/svg', tagName)
+    if (children) appendChildren([children], el)
+    for (const attr in attributes) el.setAttribute(attr, attributes[attr])
+    return el
+  }
 }
 
 const SVGAnchor = createSVGComponent('a')
 
 document.body.append(
-	<svg attributes={{ viewBox: '0 0 5 4', width: 200, height: 160 }}>
-		<SVGAnchor href="#">
-			<circle attributes={{ r: 1, cx: 2, cy: 2, fill: "black" }} />
-		</SVGAnchor>
-	</svg>
+  <svg attributes={{ viewBox: '0 0 5 4', width: 200, height: 160 }}>
+    <SVGAnchor href="#">
+      <circle attributes={{ r: 1, cx: 2, cy: 2, fill: "black" }} />
+    </SVGAnchor>
+  </svg>
 )
 ```
 
@@ -182,24 +182,24 @@ Using this without JSX is fully supported, and in fact the returned elements wil
 import { element, fragment } from "tsx-vanilla"
 
 const Counter = (props: { start?: number }) => {
-	let count = props.start || 0
-	return fragment({
-		children: [
-			element('h2', null, 'Counter'),
-			element('button', { 
-				className: 'btn',
-				onclick() {
-					this.textContent = `count: ${++count}`
-				}
-			}, 'count: ', count)
-		]
-	})
+  let count = props.start || 0
+  return fragment({
+    children: [
+      element('h2', null, 'Counter'),
+      element('button', { 
+        className: 'btn',
+        onclick() {
+          this.textContent = `count: ${++count}`
+        }
+      }, 'count: ', count)
+    ]
+  })
 }
 
 document.body.append(
-	element('h1', null, 'tsx-vanilla'),
-	Counter({}),
-	Counter({ start: 2 })
+  element('h1', null, 'tsx-vanilla'),
+  Counter({}),
+  Counter({ start: 2 })
 )
 ```
 

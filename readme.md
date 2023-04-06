@@ -1,10 +1,12 @@
+[![Bundle size](https://badgen.net/bundlephobia/minzip/tsx-vanilla)](https://bundlephobia.com/package/tsx-vanilla)
+
 # tsx-vanilla
 
 Create DOM elements using JSX with excellent TypeScript support
 
 ## Installation
 
-  npm install tsx-vanilla
+	npm install tsx-vanilla
 
 ## Setup
 
@@ -43,6 +45,10 @@ import * as React from "tsx-vanilla"
 ```
 
 You can also use something like Babel.
+
+## Demo
+
+[![open in stackblitz](https://developer.stackblitz.com/img/open_in_stackblitz.svg)](https://stackblitz.com/fork/github/FIameCaster/tsx-vanilla/tree/main/example)
 
 ## Usage
 

@@ -1,0 +1,72 @@
+:root {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  height: 100%;
+  color-scheme: light dark;
+  background-color: #1a1a1a;
+}
+
+body {
+  margin: 0;
+  min-height: 100%;
+  display: grid;
+}
+
+#app {
+  display: grid;
+  place-items: center;
+  align-content: center;
+  min-height: 100%;
+  gap: 1em;
+  overflow: hidden;
+  position: relative;
+  padding: 2em 1em 1em;
+  box-sizing: border-box;
+}
+
+h2 {
+  margin: 0;
+}
+
+h1 {
+  font-size: 4em;
+  line-height: 1.1;
+  margin: -0.5em 0 0.5em;
+}
+
+button {
+  border-radius: 0.4em;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  background-color: #1a1a1a;
+  cursor: pointer;
+  transition: border-color 0.15s;
+}
+button:hover {
+  border-color: #646cff;
+}
+button:focus-visible {
+  outline: 4px auto -webkit-focus-ring-color;
+}
+
+path {
+  stroke: #272727;
+	fill: #272727;
+}
+
+@media (prefers-color-scheme: light) {
+  :root {
+    color: #213547;
+    background-color: #fff;
+  }
+  button {
+    background-color: #fff;
+  }
+  path {
+    stroke: #eee;
+    fill: #eee;
+  }
+}

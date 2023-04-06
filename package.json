@@ -1,0 +1,28 @@
+{
+  "name": "tsx-vanilla",
+  "version": "0.1.0",
+  "description": "",
+  "main": "lib/index.js",
+  "types": "lib/index.d.ts",
+  "files": [
+    "lib", "src"
+  ],
+  "scripts": {
+    "prepublish": "tsc"
+  },
+  "keywords": [
+    "typescript", "jsx", "javascript", "dom"
+  ],
+  "author": "FIameCaster",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/FIameCaster/tsx-vanilla.git"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "csstype": "^3.1.1"
+  },
+  "devDependencies": {
+    "typescript": "^4.9.5"
+  }
+}

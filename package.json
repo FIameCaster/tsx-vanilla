@@ -1,7 +1,7 @@
 {
   "name": "tsx-vanilla",
   "version": "0.1.0",
-  "description": "",
+  "description": "Create DOM elements using JSX with excellent TypeScript support",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
   "files": [
@@ -16,7 +16,7 @@
   "author": "FIameCaster",
   "repository": {
     "type": "git",
-    "url": "https://github.com/FIameCaster/tsx-vanilla.git"
+    "url": "git+https://github.com/FIameCaster/tsx-vanilla.git"
   },
   "license": "MIT",
   "dependencies": {

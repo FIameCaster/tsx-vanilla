@@ -20,7 +20,7 @@ To use JSX, you need a compiler to transform the JSX into something the browser 
 }
 ```
 
-And then you include this import statement in every file where you want to use JSX
+And then you include this import statement in every file where you want to use JSX.
 
 ```js
 import { element, fragment } from "tsx-vanilla"
@@ -36,13 +36,13 @@ Alternatively you can add this to your `tsconfig.json`,
 }
 ```
 
-and import this
+and import this.
 
 ```js
 import * as React from "tsx-vanilla"
 ```
 
-You can also use something like Babel
+You can also use something like Babel.
 
 ## Usage
 
@@ -73,7 +73,7 @@ document.body.append(
 ```
 
 Attributes are set directly on the DOM element using something like this: `element[key] = props[key]`.
-This is the case for most attributes, but not
+This is the case for most attributes, but not:
 
 - `style`
 - `attributes`
@@ -102,7 +102,7 @@ Not all attributes can be set as a property directly on the element. Therefore y
 
 ### dataset
 
-`dataset` accepts an object which simply gets copied over to the element's dataset using `Object.assign()`
+`dataset` accepts an object which simply gets copied over to the element's dataset using `Object.assign()`.
 
 ### children
 
@@ -131,7 +131,7 @@ console.log(divRef.value)
 ### shadowRootOptions
 
 `shadowRootOptions` accepts an object which will get passed to `Element.attachShadow()` for the element.
-If this attribute is present, all children will be appended to the `ShadowRoot` instead of the element
+If this attribute is present, all children will be appended to the `ShadowRoot` instead of the element.
 
 ### Other attributes
 
@@ -139,7 +139,7 @@ All properties that can be set on an element are supported. This includes `textC
 
 ## SVG support
 
-All non-deprecated SVG elements except for those with the same name as an HTML element are supported. Since most attributes have to be set with `setAttribute()`, you need to use `attributes` a lot with SVG elements
+All non-deprecated SVG elements except for those with the same name as an HTML element are supported. Since most attributes have to be set with `setAttribute()`, you need to use `attributes` a lot with SVG elements.
 
 ```jsx
 <svg attributes={{ viewBox: '0 0 5 4', width: 200, height: 160 }}>
@@ -149,7 +149,7 @@ All non-deprecated SVG elements except for those with the same name as an HTML e
 </svg>
 ```
 
-If you need to use non-supported SVG elements, you can include a function like this one to create a component
+If you need to use non-supported SVG elements, you can include a function like this one to create a component.
 
 ```jsx
 import { element, appendChildren } from "tsx-vanilla"
@@ -203,7 +203,7 @@ document.body.append(
 )
 ```
 
-It's not even that clumbsy without JSX
+It's not even that clumbsy without JSX.
 
 ## What is this meant for?
 

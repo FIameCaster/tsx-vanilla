@@ -426,7 +426,7 @@ declare global {
 			onselectstart: (this: T, ev: Event) => any
 			onselectionchange: (this: T, ev: Event) => any
 			oninvalid: (this: T, ev: Event) => any
-			/** Warning: Only supported with addEventListener in chromium browsers */
+		/** Warning: Only supported with `addEventListener` in chromium browsers */
 			onanimationcancel: (this: T, ev: AnimationEvent) => any
 			onanimationend: (this: T, ev: AnimationEvent) => any
 			onanimationiteration: (this: T, ev: AnimationEvent) => any

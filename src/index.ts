@@ -677,7 +677,7 @@ declare global {
 				enctype: string
 				encoding: string
 				acceptCharset: string
-				autocomplete: string
+				autocomplete: "on" | "off" | ""
 				noValidate: boolean
 
 				onreset: (this: HTMLFormElement, ev: Event) => any
@@ -794,7 +794,7 @@ declare global {
 				step: string
 				type: "button" | "checkbox" | "color" | "date" | "datetime-local" | "email" | "file" | "hidden" | "image" | "month" | "number" | "password" | "radio" | "range" | "reset" | "search" | "submit" | "tel" | "text" | "time" | "url" | "week"
 				useMap: string
-				value: string
+				value: string | number
 				valueAsDate: Date
 				valueAsNumber: number
 				formAction: string
@@ -816,16 +816,10 @@ declare global {
 				accept: string
 				files: FileList
 				capture: "user" | "environment"
-				autocomplete: "off" | "on" | "name" | "honorific-prefix" | "given-name" | "additional-name" | "family-game" | 
-				"honorific-suffix" | "nickname" | "email" | "username" | "new-password" | "current-password" | "one-time-code" | 
-				"organization-title" | "organization" | "addess-line1" | "address-line2" | "address-line3" | "address-level4" | 
-				"address-level3" | "address-level2" | "address-level1" | "country" | "country-name" | "postal-code" | "cc-name" | 
-				"cc-given-name" | "cc-additional-name" | "cc-family-name" | "cc-number" | "cc-exp" | "cc-exp-month" | "cc-exp-year" | 
-				"cc-csc" | "cc-type" | "transaction-amount" | "language" | "bday" | "bday-day" | "bday-month" | "bday-year" | "sex" | 
-				"tel" | "tel-country-code" | "tel-national" | "tel-area-code" | "tel-local" | "tel-extension" | "impp" | "url" | "photo"
-				max: string
+				autocomplete: string
+				max: string | number
 				maxLength: number
-				min: string
+				min: string | number
 				minLength: number
 				pattern: string
 				placeholder: string
@@ -1091,7 +1085,7 @@ declare global {
 			template: {}
 			textarea: {
 				autocapitalize: "none" | "off" | "characters" | "words" | "sentences"
-				autocomplete: string
+				autocomplete: "on" | "off" | ""
 				autofocus: boolean
 				cols: number
 				defaultValue: string

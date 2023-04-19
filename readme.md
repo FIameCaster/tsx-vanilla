@@ -1,4 +1,5 @@
 [![Bundle size](https://badgen.net/bundlephobia/minzip/tsx-vanilla)](https://bundlephobia.com/package/tsx-vanilla)
+[![NPM Package](https://badgen.net/npm/v/tsx-vanilla)](https://npmjs.com/tsx-vanilla)
 
 # tsx-vanilla
 
@@ -112,7 +113,7 @@ Not all attributes can be set as a property directly on the element. Therefore y
 
 ### children
 
-Assigning children using the `children` attribute is supported as long as the JSX-element doesn't also have nested elements. Children can be strings, numbers, Nodes, or an array of the previously mentioned types. `true`, `false`, `null` and `undefined` are allowed to be passed as children, but will be filtered out. 
+Assigning children using the `children` attribute is supported as long as the JSX-element doesn't also have nested elements. Children can be strings, numbers, nodes, or an array of the previously mentioned types. `true`, `false`, `null` and `undefined` are allowed to be passed as children, but will be filtered out. 
 
 When creating components accepting children, multiple children will be passed as an array, while single children won't. Something to also keep in mind when creating components is that the children array passed to your component won't be flattend. 
 

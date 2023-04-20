@@ -1,8 +1,8 @@
 import { element, fragment, ref } from 'tsx-vanilla'
 import { Counter } from './counter'
 
-// Static elements should be in HTML-files
-// This example is a demonstation of the different features, not of how it should be used
+// Static elements should probably be in HTML-files
+// This example is just a demonstation of the different features
 
 document.getElementById('app')!.append(
 	<h1>tsx-vanilla</h1>,

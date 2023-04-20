@@ -13,6 +13,6 @@
     "vite": "^4.2.0"
   },
   "dependencies": {
-    "tsx-vanilla": "^0.1.0"
+    "tsx-vanilla": "^0.1.2"
   }
 }

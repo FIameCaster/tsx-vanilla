@@ -1,6 +1,6 @@
 {
   "name": "tsx-vanilla",
-  "version": "0.1.2",
+  "version": "1.0.0",
   "description": "Create DOM elements using JSX with excellent TypeScript support",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",
@@ -24,9 +24,9 @@
   },
   "license": "MIT",
   "dependencies": {
-    "csstype": "^3.1.1"
+    "csstype": "^3.1.2"
   },
   "devDependencies": {
-    "typescript": "^4.9.5"
+    "typescript": "^5.1.6"
   }
 }

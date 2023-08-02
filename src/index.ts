@@ -1,46 +1,46 @@
-import type * as CSS from 'csstype'
+import type * as CSS from "csstype"
 
 function element<T extends ((props: object) => JSX.Element)>(component: T, props?: Parameters<T>[0] | null, ...children: JSX.Children): ReturnType<T>
 
-function element<T extends keyof FilteredSVGTagNameMap>(tagName: T, props?: JSX.SVGElementProps<T> | null, ...children: JSX.Children): SVGElementTagNameMap[T]
+function element<T extends keyof MathMLTags>(tagName: T, props?: JSX.MathMLElementProps<T> | null, ...children: JSX.Children): MathMLElement
 
-function element<T extends keyof HTMLElementTagNameMap>(tagName: T, props?: JSX.HTMLElementProps<T> | null, ...children: JSX.Children): HTMLElementTagNameMap[T]
+function element<T extends keyof SVGTags>(tagName: T, props?: JSX.SVGElementProps<T> | null, ...children: JSX.Children): SVGElementTagNameMap[T]
 
-function element(tagName: ((props: object) => JSX.Element) | string, props?: { [key: string]: any }, ...children: JSX.Children) {
-	if (typeof tagName == 'string') {
-		const el = svgTags.has(tagName) ? 
-			document.createElementNS('http://www.w3.org/2000/svg', tagName) :
-			document.createElement(tagName)
+function element<T extends keyof HTMLTags>(tagName: T, props?: JSX.HTMLElementProps<T> | null, ...children: JSX.Children): HTMLElementTagNameMap[T]
+
+function element(tagName: ((props: object) => JSX.Element) | string, props?: { [key: string]: any } | null, ...children: JSX.Children) {
+	if (typeof tagName == "string") {
+		const el = tagMap[tagName]?.(tagName) || document.createElement(tagName)
 
 		appendChildren(
-			props?.children ? [props.children] : children,
+			props?.children != null ? [props.children] : children,
 			props?.shadowRootOptions ? el.attachShadow(props.shadowRootOptions) : el
 		)
 		if (props) {
 			const { attributes, style, dataset, ref } = props
 
-			for (const prop in props) {
+			for (let prop in props) {
 				if (!specialProps.has(prop)) el[prop] = props[prop]
 			}
-			
-			if (attributes) for (const attr in attributes) el.setAttribute(attr, attributes[attr])
+
+			if (attributes) for (let attr in attributes) el.setAttribute(attr, attributes[attr])
 			if (dataset) Object.assign(el.dataset, dataset)
-			if (style) {
-				typeof style == 'string' ? el.setAttribute('style', style) : addStyles(el.style, style)
-			}
-			if (ref) typeof ref == 'function' ? ref(el) : ref.value = el
+			if (style) // @ts-ignore
+				typeof style == "string" ? el.style = style : addStyles(el.style, style)
+
+			if (ref) typeof ref == "function" ? ref(el) : ref.value = el
 		}
 		return el
 	}
 
 	let l = children.length
 	// If there are children they need to be passed to the component
-	// If there's only 1 child, children should not be an array
-	return tagName(l ? Object.assign({ children: l > 1 ? children : children[0] }, props || {}) : props || {})
+	// If there"s only 1 child, children should not be an array
+	return tagName(l ? { children: l > 1 ? children : children[0], ...props } : props || {})
 }
 
 const fragment = ({ children }: { children?: JSX.Child | JSX.Children }) => {
-	const fragment = document.createDocumentFragment()
+	const fragment = new DocumentFragment
 	if (children) appendChildren([children], fragment)
 	return fragment
 }
@@ -48,34 +48,51 @@ const fragment = ({ children }: { children?: JSX.Child | JSX.Children }) => {
 const ref = <T>(value?: T | null) => ({ value })
 
 const addStyles = (style: CSSStyleDeclaration, styles: JSX.CSSProperties) => {
-	for (const name in styles) {
-		if (name.indexOf('--')) style[name] = styles[name]
+	for (let name in styles) {
+		if (name.indexOf("--")) style[name] = styles[name]
 		else style.setProperty(name, styles[name])
 	}
 }
 
 const appendChildren = (children: JSX.Children, parent: ParentNode) => {
-	for (const child of children) {
-		if (child == null || typeof child == 'boolean') continue
+	for (let child of children) {
+		if (child == null || typeof child == "boolean") continue
 		if (Array.isArray(child)) appendChildren(child, parent)
-		// Just giving the append method numbers directly instead of converting to a string
+		// Letting javascript convert numbers automatically
 		else parent.append(child as string | Node)
 	}
 }
 
 // SVG elements with the same name as an HTML element such as `a`, `script`, `style` and `title` are removed
-const svgTags = new Set([
-	"animate", "animateMotion", "animateTransform", "circle", "clipPath", "defs", "desc",
-	"ellipse", "feBlend", "feColorMatrix", "feComponentTransfer", "feDiffuseLighting",
-	"feDisplacementMap", "feDistanceLight", "feDropShadow", "feFlood", "feFuncA", "feFuncB",
-	"feFuncG", "feFuncR", "feGaussianBlur", "feImage", "feMerge", "feMergeNode", "feMorphology",
-	"feOffset", "fePointLight", "feSpecularLighting", "feSpotLight", "feTile", "feTurbulence",
-	"filter", "foreignObject", "g", "image", "line", "linearGradient", "marker", "mask",
-	"metadata", "mpath", "path", "pattern", "polygon", "polyline", "radialGradient", "rect", 
-	"set", "stop", "svg", "switch", "symbol", "text", "textPath", "tspan", "use", "view"
-])
+/** Adds SVG support. Must be called before creating any SVG elements with JSX. */
+const addSVGSupport = () => {
+	let fn = (tagName: string) => document.createElementNS("http://www.w3.org/2000/svg", tagName);
+	[
+		"animate", "animateMotion", "animateTransform", "circle", "clipPath", "defs", "desc",
+		"ellipse", "feBlend", "feColorMatrix", "feComponentTransfer", "feDiffuseLighting",
+		"feDisplacementMap", "feDistanceLight", "feDropShadow", "feFlood", "feFuncA", "feFuncB",
+		"feFuncG", "feFuncR", "feGaussianBlur", "feImage", "feMerge", "feMergeNode", "feMorphology",
+		"feOffset", "fePointLight", "feSpecularLighting", "feSpotLight", "feTile", "feTurbulence",
+		"filter", "foreignObject", "g", "image", "line", "linearGradient", "marker", "mask",
+		"metadata", "mpath", "path", "pattern", "polygon", "polyline", "radialGradient", "rect",
+		"set", "stop", "svg", "switch", "symbol", "text", "textPath", "tspan", "use", "view"
+	].forEach(tag => tagMap[tag] = fn)
+}
 
-const specialProps = new Set(['dataset', 'style', 'attributes', 'ref', 'children'])
+/** Adds MathML support. Must be called before creating any MathML elements with JSX. */
+const addMathMLSupport = () => {
+	let fn = (tagName: string) => document.createElementNS("http://www.w3.org/1998/Math/MathML", tagName);
+	[
+		"annotation", "annotation-xml", "maction", "math", "merror", "mfrac", "mi",
+    "mmultiscripts", "mn", "mo", "mover", "mpadded", "mphantom", "mprescripts",
+    "mroot", "mrow", "ms", "mspace", "msqrt", "mstyle", "msub", "msubsup", "msup",
+    "mtable", "mtd", "mtext", "mtr", "munder", "munderover", "semantics"
+	].forEach(tag => tagMap[tag] = fn)
+}
+
+const tagMap: Record<string, (tagName: string) => SVGElement | MathMLElement> = {}
+
+const specialProps = new Set(["dataset", "style", "attributes", "ref", "children"])
 
 type CustomProperties = {
 	[key: `--${string}`]: string | null
@@ -89,16 +106,30 @@ type SVGTags = {
 	[Property in keyof FilteredSVGTagNameMap]: object
 }
 
+type MathMLTags = {
+	[Property in keyof MathMLElementTagNameMap]: object
+}
+
 type FilteredSVGTagNameMap = Omit<SVGElementTagNameMap, "a" | "script" | "style" | "title">
 
-type AriaRole = 'alert' | 'alertdialog' | 'application' | 'article' | 'banner' | 'button' | 'cell' | 'checkbox' | 
-'columnheader' | 'combobox' | 'complementary' | 'contentinfo' | 'definition' | 'dialog' | 'directory' | 'document' | 
-'feed' | 'figure' | 'form' | 'grid' | 'gridcell' | 'group' | 'heading' | 'img' | 'link' | 'list' | 'listbox' | 
-'listitem' | 'log' | 'main' | 'marquee' | 'math' | 'menu' | 'menubar' | 'menuitem' | 'menuitemcheckbox' | 
-'menuitemradio' | 'navigation' | 'none' | 'note' | 'option' | 'presentation' | 'progressbar' | 'radio' | 
-'radiogroup' | 'region' | 'row' | 'rowgroup' | 'rowheader' | 'scrollbar' | 'search' | 'searchbox' | 
-'separator' | 'slider' | 'spinbutton' | 'status' | 'switch' | 'tab' | 'table' | 'tablist' | 'tabpanel' | 
-'term' | 'textbox' | 'timer' | 'toolbar' | 'tooltip' | 'tree' | 'treegrid' | 'treeitem'
+type AriaRole = "alert" | "alertdialog" | "application" | "article" | "banner" | "button" | "cell" | "checkbox" |
+	"columnheader" | "combobox" | "complementary" | "contentinfo" | "definition" | "dialog" | "directory" | "document" |
+	"feed" | "figure" | "form" | "grid" | "gridcell" | "group" | "heading" | "img" | "link" | "list" | "listbox" |
+	"listitem" | "log" | "main" | "marquee" | "math" | "menu" | "menubar" | "menuitem" | "menuitemcheckbox" |
+	"menuitemradio" | "navigation" | "none" | "note" | "option" | "presentation" | "progressbar" | "radio" |
+	"radiogroup" | "region" | "row" | "rowgroup" | "rowheader" | "scrollbar" | "search" | "searchbox" |
+	"separator" | "slider" | "spinbutton" | "status" | "switch" | "tab" | "table" | "tablist" | "tabpanel" |
+	"term" | "textbox" | "timer" | "toolbar" | "tooltip" | "tree" | "treegrid" | "treeitem"
+
+type Autocomplete = "off" | "on" | "name" | "honorific-prefix" | "given-name" | "additional-name" |
+	"family-game" | "honorific-suffix" | "nickname" | "email" | "username" | "new-password" |
+	"current-password" | "one-time-code" | "organization-title" | "organization" | "addess-line1" |
+	"address-line2" | "address-line3" | "address-level4" | "address-level3" | "address-level2" |
+	"address-level1" | "country" | "country-name" | "postal-code" | "cc-name" | "cc-given-name" |
+	"cc-additional-name" | "cc-family-name" | "cc-number" | "cc-exp" | "cc-exp-month" | "cc-exp-year" |
+	"cc-csc" | "cc-type" | "transaction-amount" | "language" | "bday" | "bday-day" | "bday-month" |
+	"bday-year" | "sex" | "tel" | "tel-country-code" | "tel-national" | "tel-area-code" | "tel-local" |
+	"tel-extension" | "impp" | "url" | "photo" | (string & {})
 
 type ReferrerPolicy = "no-referrer" | "no-referrer-when-downgrade" | "origin" | "origin-when-cross-origin" | "same-origin" | "strict-origin" | "strict-origin-when-cross-origin" | "unsafe-url"
 type Target = "_self" | "_blank" | "_parent" | "_top"
@@ -112,6 +143,16 @@ interface PictureInPictureEvent extends Event {
 
 interface ContentVisibilityAutoStateChangeEvent extends Event {
 	readonly skipped: boolean
+}
+
+interface ToggleEvent extends Event {
+	readonly newState: "open" | "closed"
+	readonly oldState: "open" | "closed"
+}
+
+interface OverscrollEvent extends Event {
+	readonly deltaX: number
+	readonly deltaY: number
 }
 
 type AnimationAttributes = {
@@ -183,9 +224,12 @@ type TextAttributes = {
 	"glyph-orientation-vertical": string
 	/** @deprecated */
 	kerning: string
+	lengthAdjust: "spacing" | "spacingAndGlyphs"
 	"letter-spacing": string
+	systemLanguage: string
 	"text-anchor": "start" | "middle" | "end" | "inherit"
 	"text-decortation": "none" | "underline" | "overline" | "line-through" | "blink" | "inherit"
+	textLength: string
 	"unicode-bidi": string
 	"word-spacing": string
 	"writing-mode": "lr-tb" | "rl-tb" | "tb-rl" | "lr" | "rl" | "tb" | "inherit"
@@ -221,9 +265,11 @@ declare global {
 			[T in keyof HTMLElementTagNameMap]: HTMLElementProps<T>
 		} & {
 			[T in keyof FilteredSVGTagNameMap]: SVGElementProps<T>
+		} & {
+			[T in keyof MathMLElementTagNameMap]: MathMLElementProps<T>
 		}
 
-		type Child = Node | number | string | null | undefined | boolean
+		type Child = Node | string | number | null | undefined | boolean
 		type Children = (Child | Children)[]
 		type CSSProperties = CSS.Properties | CustomProperties
 
@@ -231,7 +277,7 @@ declare global {
 			attributes?: Partial<AriaAttributes & GlobalSVGAttributes & SVGAttributes[T]>,
 			style?: JSX.CSSProperties | string,
 			dataset?: { [key: string]: string | number | boolean }
-			ref?: ReturnType<typeof ref<SVGElementTagNameMap[T]>> | ((el: SVGElementTagNameMap[T]) => void)
+			ref?: ReturnType<typeof ref<SVGElementTagNameMap[T]>> | ((el: SVGElementTagNameMap[T]) => any)
 			children?: JSX.Child | JSX.Children
 		}
 
@@ -239,12 +285,21 @@ declare global {
 			attributes?: Partial<AriaAttributes & GlobalHTMLAttributes & HTMLAttributes[T]>,
 			style?: JSX.CSSProperties | string,
 			dataset?: { [key: string]: string | number | boolean }
-			ref?: ReturnType<typeof ref<HTMLElementTagNameMap[T]>> | ((el: HTMLElementTagNameMap[T]) => void)
+			ref?: ReturnType<typeof ref<HTMLElementTagNameMap[T]>> | ((el: HTMLElementTagNameMap[T]) => any)
+			children?: JSX.Child | JSX.Children
+		}
+
+		type MathMLElementProps<T extends keyof MathMLTags> = WritableMathMLProps & {
+			attributes?: Partial<AriaAttributes & GlobalHTMLAttributes & MathMLAttributes[T]>,
+			style?: JSX.CSSProperties | string,
+			dataset?: { [key: string]: string | number | boolean }
+			ref?: ReturnType<typeof ref<MathMLElement>> | ((el: MathMLElement) => any)
 			children?: JSX.Child | JSX.Children
 		}
 
 		type WritableSVGProps<Tag extends keyof SVGTags> = Partial<CommonWritableSVGProps & WritableSVGElementProps[Tag] & EventHandlers<SVGElementTagNameMap[Tag]>>
 		type WritableHTMLProps<Tag extends keyof HTMLTags> = Partial<CommonWritableHTMLProps & WritableElementProps[Tag] & EventHandlers<HTMLElementTagNameMap[Tag]>>
+		type WritableMathMLProps = Partial<CommonWritableMathMLProps & EventHandlers<MathMLElement>>
 
 		interface AriaAttributes {
 			"aria-atomic": string
@@ -295,7 +350,7 @@ declare global {
 			autocapitalize: "off" | "none" | "on" | "sentences" | "words" | "characters"
 			autofocus: Booleanish | ""
 			class: string
-			contenteditable: Booleanish | ""
+			contenteditable: Booleanish | "plaintext-only" | ""
 			dir: "lrt" | "rtl" | "auto"
 			draggable: Booleanish | ""
 			enterkeyhint: "enter" | "done" | "go" | "next" | "previous" | "search" | "send"
@@ -312,6 +367,7 @@ declare global {
 			lang: string
 			nonce: string
 			part: string
+			popover: "auto" | "manual"
 			role: AriaRole
 			slot: string
 			spellcheck: Booleanish | ""
@@ -323,52 +379,82 @@ declare global {
 
 		type GlobalSVGAttributes = {
 			[key: `data-${string}`]: string | number | boolean
+			class: string
 			id: string
 			lang: string
-			tabindex: string
 			style: string
+			tabindex: string | number
+		}
+
+		type GlobalMathMLAttributes = {
+			[key: `data-${string}`]: string | number | boolean
 			class: string
+			dir: "lrt" | "rtl"
+			displaystyle: Booleanish
+			id: string
+			mathbackground: string
+			mathcolor: string
+			mathsize: string
+			mathvariant: "normal" | "bold" | "italic" | "bold-italic" | "double-struct" | "bold-fraktur" | "script" | "bold-script" | "fraktur" | "sans-serif" | "bold-sans-serif" | "sens-serif-italic" | "sans-serif-bold-italic" | "monospace" | "initial" | "tailed" | "looped" | "stretched"
+			nonce: string
+			scriptlevel: `+${number}` | `${number}` | number
+			style: string
+			tabindex: string | number
 		}
 
 		type CommonWritableHTMLProps = {
 			accessKey: string
-			textContent: string
 			className: string
+			contentEditable: Booleanish | "plaintext-only" | "inherit" | ""
+			dir: "lrt" | "rtl" | "auto"
+			draggable: boolean
+			enterKeyHint: "enter" | "done" | "go" | "next" | "previous" | "search" | "send"
+			hidden: boolean
 			id: string
+			inert: boolean
 			innerHTML: string
 			innerText: string
+			inputMode: "none" | "text" | "decimal" | "numeric" | "tel" | "search" | "email" | "url"
+			lang: string
+			nonce: string
 			outerText: string
 			outerHTML: string
 			scrollLeft: number
 			scrollTop: number
-			contentEditable: Booleanish | "inherit" | ""
-			draggable: boolean
-			dir: "lrt" | "rtl" | "auto"
-			enterKeyHint: "enter" | "done" | "go" | "next" | "previous" | "search" | "send"
-			hidden: boolean
-			inert: boolean
-			inputMode: "none" | "text" | "decimal" | "numeric" | "tel" | "search" | "email" | "url"
-			lang: string
-			nonce: string
+			slot: string
 			spellcheck: boolean
 			tabIndex: number
+			textContent: string
 			title: string
 			translate: boolean
-			slot: string
+			virtualKeyboardPolicy: "auto" | "manual"
 		}
 		
 		type CommonWritableSVGProps = {
 			autofocus: boolean
-			accessKey: string
-			textContent: string
 			id: string
 			innerHTML: string
 			outerHTML: string
+			nonce: string
 			scrollLeft: number
 			scrollTop: number
-			nonce: string
-			tabIndex: number
 			slot: string
+			tabIndex: number
+			textContent: string
+		}
+
+		type CommonWritableMathMLProps = {
+			autofocus: boolean
+			className: string
+			id: string
+			innerHTML: string
+			nonce: string
+			outerHTML: string
+			scrollLeft: number
+			scrollTop: number
+			slot: string
+			tabIndex: number
+			textContent: string
 		}
 
 		// Most events that can only be fired on a few different types of elements are removed
@@ -377,6 +463,8 @@ declare global {
 			onerror: (this: T, ev: ErrorEvent) => any
 			onload: (this: T, ev: Event) => any
 			onscroll: (this: T, ev: Event) => any
+			onscrollend: (this: T, ev: Event) => any
+			onoverscroll: (this: T, ev: OverscrollEvent) => any
 			onsecuritypolicyviolation: (this: T, ev: SecurityPolicyViolationEvent) => any
 			onselect: (this: T, ev: Event) => any
 			onwheel: (this: T, ev: Event) => any
@@ -417,16 +505,16 @@ declare global {
 			onpointerleave: (this: T, ev: PointerEvent) => any
 			ongotpointercapture: (this: T, ev: PointerEvent) => any
 			onlostpointercapture: (this: T, ev: PointerEvent) => any
-			ondrag?: (this: T, ev: DragEvent) => any
-			ondragend?: (this: T, ev: DragEvent) => any
-			ondragenter?: (this: T, ev: DragEvent) => any
-			ondragleave?: (this: T, ev: DragEvent) => any
-			ondragover?: (this: T, ev: DragEvent) => any
-			ondragstart?: (this: T, ev: DragEvent) => any
+			ondrag: (this: T, ev: DragEvent) => any
+			ondragend: (this: T, ev: DragEvent) => any
+			ondragenter: (this: T, ev: DragEvent) => any
+			ondragleave: (this: T, ev: DragEvent) => any
+			ondragover: (this: T, ev: DragEvent) => any
+			ondragstart: (this: T, ev: DragEvent) => any
 			onselectstart: (this: T, ev: Event) => any
 			onselectionchange: (this: T, ev: Event) => any
 			oninvalid: (this: T, ev: Event) => any
-		/** Warning: Only supported with `addEventListener` in chromium browsers */
+			/** Warning: Only supported with `addEventListener` in chromium browsers */
 			onanimationcancel: (this: T, ev: AnimationEvent) => any
 			onanimationend: (this: T, ev: AnimationEvent) => any
 			onanimationiteration: (this: T, ev: AnimationEvent) => any
@@ -437,6 +525,9 @@ declare global {
 			ontransitioncancel: (this: T, ev: TransitionEvent) => any
 			oninput: (this: T, ev: Event) => any
 			onbeforeinput: (this: T, ev: Event) => any
+			onbeforetoggle: (this: T, ev: ToggleEvent) => any
+			ontoggle: (this: T, ev: ToggleEvent) => any
+			onbeforematch: (this: T, ev: Event) => any
 		}
 
 		// Writable properties specific to a certain element
@@ -444,19 +535,20 @@ declare global {
 		interface WritableElementProps extends HTMLTags {
 			a: {
 				download: string
-				hask: string
+				hash: string
 				host: string
 				hostname: string
 				href: String
 				hreflang: string
 				password: string
 				pathname: string
-				port: string
-				protocal: string
+				port: string | number
+				protocol: string
 				referrerPolicy: ReferrerPolicy
-				rel: string
+				rel: "alternate" | "author" | "bookmark" | "external" | "help" | "license" | "me" | "next" | "nofollow" | "noopener" | "noreferrer" | "opener" | "prev" | "search" | "tag"
 				search: string
 				target: Target
+				text: string
 				type: string
 				username: string
 				/** @deprecated */
@@ -482,16 +574,16 @@ declare global {
 				href: string
 				/** @deprecated */
 				noHref: boolean
-				origin: string
 				password: string
 				pathname: string
 				port: string
+				protocol: string
 				referrerPolicy: ReferrerPolicy
-				rel: string
+				rel: "alternate" | "author" | "bookmark" | "external" | "help" | "license" | "me" | "next" | "nofollow" | "noopener" | "noreferrer" | "opener" | "prev" | "search" | "tag"
 				search: string
 				shape: "rect" | "circle" | "poly" | "default"
 				target: Target
-				userName: string
+				username: string
 			}
 			article: {
 				shadowRootOptions: ShadowRootInit
@@ -510,7 +602,7 @@ declare global {
 				loop: boolean
 				muted: boolean
 				playbackRate: number
-				preload: 'none' | 'metadata' | 'auto'
+				preload: "none" | "metadata" | "auto"
 				preservesPitch: boolean
 				src: string
 				srcObject: MediaStream | MediaSource | Blob
@@ -558,8 +650,8 @@ declare global {
 				bgColor: string
 				/** @deprecated */
 				link: string
-				/** @deprecated */
 				shadowRootOptions: ShadowRootInit
+				/** @deprecated */
 				text: string
 				/** @deprecated */
 				vLink: string
@@ -572,17 +664,22 @@ declare global {
 				autoFocus: boolean
 				disabled: boolean
 				formAction: string
-				formEnctype: string
+				formEnctype: "application/x-www-form-urlencoded" | "multipart/form-data" | "text/plain"
 				formMethod: "post" | "get" | "dialog"
 				formNoValidate: boolean
 				formTarget: Target
 				name: string
+				popoverTargetAction: "hide" | "show" | "toggle"
+				popoverTargetElement: JSX.Element
 				type: "submit" | "reset" | "button" | "menu"
 				value: string
 			}
 			canvas: {
-				height: number
-				width: number
+				height: string | number
+				width: string | number
+
+				oncontextlost: (this: HTMLCanvasElement, ev: Event) => any
+				oncontextrestored: (this: HTMLCanvasElement, ev: Event) => any
 			}
 			caption: {
 				/** @deprecated */
@@ -627,13 +724,11 @@ declare global {
 			}
 			details: {
 				open: boolean
-
 				ontoggle: (this: HTMLDetailsElement, ev: Event) => any
 			}
 			dialog: {
 				open: boolean
 				returnValue: string
-
 				oncancel: (this: HTMLDialogElement, ev: Event) => any
 				onclose: (this: HTMLDialogElement, ev: Event) => any
 			}
@@ -651,18 +746,16 @@ declare global {
 			embed: {
 				/** @deprecated */
 				align: Align
-				height: string
+				height: string | number
 				/** @deprecated */
 				name: string
 				src: string
 				type: string
-				width: string
+				width: string | number
 			}
 			fieldset: {
 				disabled: boolean
 				name: string
-
-				willValidate: boolean
 			}
 			figcaption: {}
 			figure: {}
@@ -672,14 +765,14 @@ declare global {
 			form: {
 				name: string
 				method: "post" | "get" | "dialog"
-				target: Target
 				action: string
-				enctype: string
+				enctype: "application/x-www-form-urlencoded" | "multipart/form-data" | "text/plain"
 				encoding: string
 				acceptCharset: string
 				autocomplete: "on" | "off" | ""
 				noValidate: boolean
-
+				rel: "external" | "help" | "license" | "next" | "nofollow" | "noopener" | "noreferrer" | "opener" | "prev" | "search"
+				target: Target
 				onreset: (this: HTMLFormElement, ev: Event) => any
 				onsubmit: (this: HTMLFormElement, ev: SubmitEvent) => any
 			}
@@ -744,8 +837,12 @@ declare global {
 				allow: string
 				allowfullscreen: boolean
 				/** @deprecated */
+				allowPaymentRequest: boolean
+				credentialless: boolean
+				csp: String
+				/** @deprecated */
 				frameBorder: string
-				height: string
+				height: string | number
 				/** @deprecated */
 				longDesc: string
 				/** @deprecated */
@@ -754,25 +851,27 @@ declare global {
 				marginWidth: string
 				name: string
 				referrerPolicy: ReferrerPolicy
+				sandbox: "" | "allow-downloads" | "allow-downloads-without-user-activation" | "allow-forms" | "allow-modals" | "allow-orientation-lock" | "allow-pointer-lock" | "allow-popups" | "allow-popups-to-escape-sandbox" | "allow-presentation" | "allow-same-origin" | "allow-scripts" | "allow-storage-access-by-user-activation" | "allow-top-navigation" | "allow-top-navigation-by-user-activation" | "allow-top-navigation-to-custom-protocols" | (string & {})
 				/** @deprecated */
-				scrolling: string
+				scrolling: "auto" | "yes" | "no"
 				src: string
 				srcdoc: string
-				width: string
+				width: string | number
 			}
 			img: {
 				alt: string
 				crossOrigin: "anonymous" | "use-credentials" | ""
-				decoding: 'sync' | 'async' | 'auto'
-				height: number
+				decoding: "sync" | "async" | "auto"
+				fetchPriority: "auto" | "high" | "low"
+				height: string | number
 				isMap: boolean
-				loading: 'eager' | 'lazy'
+				loading: "eager" | "lazy"
 				referrerPolicy: ReferrerPolicy
 				sizes: string
 				src: string
 				srcset: string
 				useMap: string
-				width: number
+				width: string | number
 				/** @deprecated */
 				align: Align
 				/** @deprecated */
@@ -787,21 +886,25 @@ declare global {
 			input: {
 				/** @deprecated */
 				align: Align
+				autocapitalize: "none" | "off" | "characters" | "words" | "sentences"
 				defaultValue: string
 				dirName: string
 				multiple: boolean
 				name: string
 				step: string
 				type: "button" | "checkbox" | "color" | "date" | "datetime-local" | "email" | "file" | "hidden" | "image" | "month" | "number" | "password" | "radio" | "range" | "reset" | "search" | "submit" | "tel" | "text" | "time" | "url" | "week"
+				/** @deprecated */
 				useMap: string
 				value: string | number
 				valueAsDate: Date
 				valueAsNumber: number
 				formAction: string
-				formEnctype: string
+				formEnctype: "application/x-www-form-urlencoded" | "multipart/form-data" | "text/plain"
 				formMethod: "get" | "post" | "dialog"
 				formNoValidate: boolean
 				formTaget: Target
+				popoverTargetAction: "hide" | "show" | "toggle"
+				popoverTargetElement: JSX.Element
 				autofocus: boolean
 				disabled: boolean
 				required: boolean
@@ -810,13 +913,13 @@ declare global {
 				defaultChecked: boolean
 				indeterminate: boolean
 				alt: string
-				height: number
+				height: string | number
 				src: string
-				width: string
+				width: string | number
 				accept: string
 				files: FileList
 				capture: "user" | "environment"
-				autocomplete: string
+				autocomplete: Autocomplete
 				max: string | number
 				maxLength: number
 				min: string | number
@@ -828,8 +931,8 @@ declare global {
 				selectionStart: number
 				selectionDirection: "forward" | "backward" | "none"
 				size: number
-
-				onchange?: (this: HTMLInputElement, ev: Event) => any
+				webkitdirectory: boolean
+				onchange: (this: HTMLInputElement, ev: Event) => any
 			}
 			ins: {
 				cite: string,
@@ -850,22 +953,25 @@ declare global {
 			}
 			link: {
 				as: string,
-				crossOrigin: "anonymous" | "use-credentials" | ""
-				disabled: boolean
-				href: string
-				hreflang: string
-				media: string
-				referrerPolicy: ReferrerPolicy
-				rel: string
-				sizes: string
-				type: string
 				/** @deprecated */
 				charset: string
+				crossOrigin: "anonymous" | "use-credentials" | ""
+				disabled: boolean
+				fetchPriority: "auto" | "high" | "low"
+				href: string
+				hreflang: string
+				imageSizes: string
+				imageSrcset: string
+				integrity: string
+				media: string
+				referrerPolicy: ReferrerPolicy
+				rel: "alternate" | "author" | "canonical" | "dns-prefetch" | "help" | "icon" | "license" | "manifest" | "me" | "modulepreload" | "next" | "pingback" | "preconnect" | "prefetch" | "preload" | "prev" | "search" | "stylesheet" | "apple-touch-icon"
 				/** @deprecated */
 				rev: string
+				sizes: string
 				/** @deprecated */
 				target: string
-				onprogress: (this: HTMLLinkElement, ev: ProgressEvent<HTMLLinkElement>) => any
+				type: string
 			}
 			main: {
 				shadowRootOptions: ShadowRootInit
@@ -883,7 +989,7 @@ declare global {
 				content: string
 				httpEquiv: string
 				media: string
-				meta: string
+				name: string
 				/** @deprecated */
 				scheme: string
 			}
@@ -915,7 +1021,7 @@ declare global {
 				data: string
 				/** @deprecated */
 				declare: boolean
-				height: string
+				height: string | number
 				/** @deprecated */
 				hspace: number
 				name: string
@@ -925,14 +1031,14 @@ declare global {
 				useMap: string
 				/** @deprecated */
 				vspace: number
-				width: string
+				width: string | number
 			}
 			ol: {
 				/** @deprecated */
 				compact: boolean
 				reversed: boolean
 				start: number
-				type: '1' | 'a' | 'A' | 'i' | 'I'
+				type: "1" | "a" | "A" | "i" | "I"
 			}
 			optgroup: {
 				disabled: string
@@ -973,24 +1079,28 @@ declare global {
 			s: {}
 			samp: {}
 			script: {
-				type: string
-				src: string
-				/** @deprecated */
-				event: string
+				async: boolean
+				crossOrigin: "anonymous" | "use-credentials" | ""
 				/** @deprecated */
 				charset: string
-				async: boolean
 				defer: boolean
-				crossOrigin: "anonymous" | "use-credentials" | ""
-				text: string
-				noModule: string
+				/** @deprecated */
+				event: string
+				fetchPriority: "auto" | "high" | "low"
+				/** @deprecated */
+				htmlFor: string
+				integrity: string
+				noModule: boolean
 				referrerPolicy: ReferrerPolicy
+				src: string
+				text: string
+				type: string
 			}
 			section: {
 				shadowRootOptions: ShadowRootInit
 			}
 			select: {
-				autocomplete: string
+				autocomplete: Autocomplete
 				autofocus: boolean
 				disabled: boolean
 				length: number
@@ -1000,8 +1110,7 @@ declare global {
 				selectedIndex: number
 				size: number
 				value: string
-
-				onchange?: (this: HTMLInputElement, ev: Event) => any
+				onchange: (this: HTMLSelectElement, ev: Event) => any
 			}
 			slot: {
 				name: string
@@ -1027,9 +1136,9 @@ declare global {
 			}
 			sup: {}
 			table: {
-				caption: HTMLTableCaptionElement
-				tHead: HTMLTableSectionElement
-				tFoot: HTMLTableSectionElement
+				caption: JSX.Element
+				tHead: JSX.Element
+				tFoot: JSX.Element
 				/** @deprecated */
 				align: Align
 				/** @deprecated */
@@ -1102,8 +1211,7 @@ declare global {
 				selectionStart: number
 				value: string
 				wrap: "hard" | "soft"
-
-				onchange?: (this: HTMLInputElement, ev: Event) => any
+				onchange: (this: HTMLTextAreaElement, ev: Event) => any
 			}
 			tfoot: {
 				/** @deprecated */
@@ -1166,7 +1274,7 @@ declare global {
 				vAlign: string
 			}
 			track: {
-				kind: 'subtitles' | 'captions' | 'descriptions' | 'chapters' | 'metadata'
+				kind: "subtitles" | "captions" | "descriptions" | "chapters" | "metadata"
 				src: string
 				srclang: string
 				label: string
@@ -1178,7 +1286,7 @@ declare global {
 				/** @deprecated */
 				compact: boolean
 				/** @deprecated */
-				type: string
+				type: "circle" | "disc" | "square"
 			}
 			var: {}
 			video: {
@@ -1191,17 +1299,17 @@ declare global {
 				defaultPlaybackRate: number
 				disablePictureInPicture: boolean
 				disableRemovePlayback: boolean
-				height: number
+				height: string | number
 				loop: boolean
 				muted: boolean
 				playbackRate: number
 				poster: string
-				preload: 'none' | 'metadata' | 'auto'
+				preload: "none" | "metadata" | "auto"
 				preservesPitch: boolean
 				src: string
 				srcObject: MediaStream | MediaSource | Blob
 				volume: number
-				width: number
+				width: string | number
 				onabort: (this: HTMLVideoElement, ev: UIEvent) => any
 				oncanplay: (this: HTMLVideoElement, ev: Event) => any
 				oncanplaythrough: (this: HTMLVideoElement, ev: Event) => any
@@ -1417,6 +1525,7 @@ declare global {
 			feImage: FilterAttributes & {
 				href: string
 				preserveAspectRatio: string
+				crossorigin: "anonymous" | "use-credentials" | ""
 			}
 			feMerge: FilterAttributes
 			feMergeNode: {
@@ -1686,12 +1795,9 @@ declare global {
 				"alignment-baseline": "auto" | "baseline" | "before-edge" | "text-before-edge" | "middle" | "central" | "after-edge" | "text-after-edge" | "ideographic" | "alphabetic" | "hanging" | "mathematical" | "inherit"
 				"baseline-shift": string
 				href: string
-				lengthAdjust: "spacing" | "spacingAndGlyphs"
 				method: "align" | "stretch"
 				spacing: "auto" | "exact"
-				systemLanguage: string
 				startOffset: string
-				textLength: string
 			}
 			title: {}
 			tspan: CommonPresentationAttributes & TextAttributes & {
@@ -1699,10 +1805,9 @@ declare global {
 				"baseline-shift": string
 				dx: string | number
 				dy: string | number
-				lengthAdjust: "spacing" | "spacingAndGlyphs"
+				
 				rotate: string
-				systemLanguage: string
-				textLength: string
+				
 				x: string | number
 				y: string | number
 			}
@@ -1721,7 +1826,150 @@ declare global {
 				viewTarget: String
 			}
 		}
+
+		interface MathMLAttributes extends MathMLTags {
+			annotation: {
+				encoding: string
+				/** @deprecated */
+				src: string
+			}
+			"annotation-xml": {
+				encoding: string
+				/** @deprecated */
+				src: string
+			}
+			maction: {
+				/** @deprecated */
+				actiontype: "statusline" | "toggle"
+				/** @deprecated */
+				selection: string | number
+			}
+			math: {
+				display: "block" | "inline"
+			}
+			merror: {}
+			mfrac: {
+				/** @deprecated */
+				denomalign: "left" | "center" | "right"
+				linetickness: string
+				/** @deprecated */
+				numalign: "left" | "center" | "right"
+			}
+			mi: {}
+			mmultiscripts: {
+				/** @deprecated */
+				subscriptshift: string
+				/** @deprecated */
+				superscriptshift: string
+			}
+			mn: {}
+			mo: {
+				accent: Booleanish | ""
+				fence: Booleanish | ""
+				largeop: Booleanish | ""
+				lspace: string
+				maxsize: string
+				minsize: string
+				movablelimits: Booleanish | ""
+				rspace: string
+				separator: Booleanish | ""
+				stretchy: Booleanish | ""
+				symmetric: Booleanish | ""
+			}
+			mover: {
+				accent: Booleanish | ""
+			}
+			mpadded: {
+				depth: string
+				height: string
+				lspace: string
+				voffset: string
+				width: string
+			}
+			mphantom: {}
+			mprescripts: {
+				/** @deprecated */
+				subscriptshift: string
+				/** @deprecated */
+				superscriptshift: string
+			}
+			mroot: {}
+			mrow: {}
+			ms: {
+				/** @deprecated */
+				lquote: string
+				/** @deprecated */
+				rquote: string
+			}
+			mspace: {
+				depth: string
+				height: string
+				width: string
+			}
+			msqrt: {}
+			mstyle: {
+				/** @deprecated */
+				background: string
+				/** @deprecated */
+				color: string
+				/** @deprecated */
+				fontsize: string
+				/** @deprecated */
+				fontstyle: string
+				/** @deprecated */
+				fontweight: string
+				/** @deprecated */
+				scriptminsize: string
+				/** @deprecated */
+				scriptsizemultiplier: string | number
+			}
+			msub: {
+				/** @deprecated */
+				subscriptshift: string
+			}
+			msubsup: {
+				/** @deprecated */
+				subscriptshift: string
+				/** @deprecated */
+				superscriptshift: string
+			}
+			msup: {
+				/** @deprecated */
+				superscriptshift: string
+			}
+			mtable: {
+				align: "axis" | "baseline" | "bottom" | "center" | "top" | (string & {})
+				columnalign: "left" | "center" | "right" | (string & {})
+				columnlines: "none" | "solid" | "dashed" | (string & {})
+				columnspacing: string
+				frame: "none" | "solid" | "dashed"
+				framespacing: string
+				rowalign: "axis" | "baseline" | "bottom" | "center" | "top" | (string & {})
+				rowlines: "none" | "solid" | "dashed" | (string & {})
+				rowspacing: string
+				width: string
+			}
+			mtd: {
+				columnspan: string | number
+				columnalign: "left" | "center" | "right"
+				rowspan: string | number
+				rowalign: "axis" | "baseline" | "bottom" | "center" | "top"
+			}
+			mtext: {}
+			mtr: {
+				columnalign: "left" | "center" | "right" | (string & {})
+				rowalign: "axis" | "baseline" | "bottom" | "center" | "top"
+			}
+			munder: {
+				accentunder: Booleanish | ""
+			}
+			munderover: {
+				accent: Booleanish | ""
+				accentunder: Booleanish | ""
+			}
+			semantics: {}
+		}
 	}
 }
 
-export { element, fragment, ref, element as createElement, fragment as Fragment, element as h, appendChildren }
+export { element, fragment, ref, element as createElement, fragment as Fragment, element as h, appendChildren, addSVGSupport, addMathMLSupport }

@@ -25,27 +25,9 @@ To use JSX, you need a compiler to transform the JSX into something the browser 
 
 And then you include this import statement in every file where you want to use JSX.
 
-```js
+```javascript
 import { element, fragment } from "tsx-vanilla"
 ```
-
-Alternatively you can add this to your `tsconfig.json`,
-
-```json
-{
-  "compilerOptions": {
-    "jsx": "react"
-  }
-}
-```
-
-and import this.
-
-```js
-import * as React from "tsx-vanilla"
-```
-
-You can also use something like Babel.
 
 ## Demo
 
@@ -77,6 +59,13 @@ document.body.append(
   <Counter />,
   <Counter start={2} />
 )
+
+// Functional components are pure overhead
+// Calling the function directly would be preferred
+document.body.append(
+  Counter({}),
+  Counter({ start: 2 })
+)
 ```
 
 Attributes are set directly on the DOM element using something like this: `element[key] = props[key]`.
@@ -98,9 +87,9 @@ This is the case for most attributes, but not:
 <p style={{
   backgroundColor: "#eee",
   borderRadius: "0.5em",
-  "--custom-property": "1em"
-  padding: "var(--custom-property)",
-}}>This is a styled paragraph.</p>
+  "--custom": "1em",
+  padding: "var(--custom)"
+}} >This is a styled paragraph.</p>
 ```
 
 ### attributes
@@ -109,7 +98,7 @@ Not all attributes can be set as a property directly on the element. Therefore y
 
 ### dataset
 
-`dataset` accepts an object which simply gets copied over to the element's dataset using `Object.assign()`.
+`dataset` accepts an object which gets copied over to the element's dataset using `Object.assign()`.
 
 ### children
 
@@ -146,38 +135,63 @@ All properties that can be set on an element are supported. This includes `textC
 
 ## SVG support
 
-All non-deprecated SVG elements except for those with the same name as an HTML element are supported. Since most attributes have to be set with `setAttribute()`, you need to use `attributes` a lot with SVG elements.
+SVG support is not enabled by default to reduce bundle size for those who don't need it. To enable SVG support, you must import and call a function before creating any SVG elements with JSX.
 
-```jsx
-<svg attributes={{ viewBox: '0 0 5 4', width: 200, height: 160 }}>
+```javascript
+import { element, addSVGSupport } from "tsx-vanilla"
+addSVGSupport()
+
+<svg attributes={{ viewBox: "0 0 5 4", width: 200, height: 160 }}>
   <circle attributes={{
     r: 1, cx: 2, cy: 2, fill: "blue", stroke: "black", "stroke-width": 0.1
   }} />
 </svg>
 ```
 
-If you need to use non-supported SVG elements, you can include a function like this one to create a component.
+All non-deprecated SVG elements except for those with the same name as an HTML element are supported. Since most attributes have to be set with `setAttribute()`, you need to use `attributes` a lot with SVG elements.
+
+### Using unsupported SVG elements
+
+If you need to use non-supported SVG elements, you can include a function similar to this one to create a component.
 
 ```jsx
 import { element, appendChildren } from "tsx-vanilla"
 
 function createSVGComponent(tagName: string) {
   return ({ children, ...attributes }: { children: JSX.Child | JSX.Children, [key: string]: any }) => {
-    const el = document.createElementNS('http://www.w3.org/2000/svg', tagName)
+    const el = document.createElementNS("http://www.w3.org/2000/svg", tagName)
     if (children) appendChildren([children], el)
     for (const attr in attributes) el.setAttribute(attr, attributes[attr])
     return el
   }
 }
 
-const SVGAnchor = createSVGComponent('a')
+const SVGAnchor = createSVGComponent("a")
 
 document.body.append(
-  <svg attributes={{ viewBox: '0 0 5 4', width: 200, height: 160 }}>
+  <svg attributes={{ viewBox: "0 0 5 4", width: 200, height: 160 }}>
     <SVGAnchor href="#">
       <circle attributes={{ r: 1, cx: 2, cy: 2, fill: "black" }} />
     </SVGAnchor>
   </svg>
+)
+```
+
+## MathML support
+
+Just like with SVG, MathML elements are supported, but not by default to keep bundle sizes small.
+
+```jsx
+import { element, addMathMLSupport } from "tsx-vanilla"
+
+addMathMLSupport()
+document.body.append(
+  <math attributes={{ display: "block" }}>
+    <msup>
+      <mi>x</mi>
+      <mn>2</mn>
+    </msup>
+  </math>
 )
 ```
 
@@ -192,25 +206,25 @@ const Counter = (props: { start?: number }) => {
   let count = props.start || 0
   return fragment({
     children: [
-      element('h2', null, 'Counter'),
-      element('button', { 
-        className: 'btn',
+      element("h2", null, "Counter"),
+      element("button", { 
+        className: "btn",
         onclick() {
           this.textContent = `count: ${++count}`
         }
-      }, 'count: ', count)
+      }, "count: ", count)
     ]
   })
 }
 
 document.body.append(
-  element('h1', null, 'tsx-vanilla'),
+  element("h1", null, "tsx-vanilla"),
   Counter({}),
   Counter({ start: 2 })
 )
 ```
 
-It's not even that clumbsy without JSX.
+It's not even that clumbsy without JSX!
 
 ## What is this meant for?
 

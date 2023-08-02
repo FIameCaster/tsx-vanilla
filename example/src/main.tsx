@@ -1,9 +1,10 @@
-import { element, fragment, ref } from 'tsx-vanilla'
+import { element, fragment, ref, addSVGSupport } from 'tsx-vanilla'
 import { Counter } from './counter'
 
 // Static elements should probably be in HTML-files
 // This example is just a demonstation of the different features
 
+addSVGSupport()
 document.getElementById('app')!.append(
 	<h1>tsx-vanilla</h1>,
 	<Counter />,

@@ -540,7 +540,7 @@ declare global {
 				hash: string
 				host: string
 				hostname: string
-				href: String
+				href: string
 				hreflang: string
 				password: string
 				pathname: string
@@ -600,7 +600,7 @@ declare global {
 				currentTime: number
 				defaultMuted: boolean
 				defaultPlaybackRate: number
-				disableRemovePlayback: boolean
+				disableRemotePlayback: boolean
 				loop: boolean
 				muted: boolean
 				playbackRate: number
@@ -830,19 +830,19 @@ declare global {
 			}
 			html: {
 				/** @deprecated */
-				version: String
+				version: string
 			}
 			i: {}
 			iframe: {
 				/** @deprecated */
 				align: Align
 				allow: string
-				allowfullscreen: boolean
+				allowFullscreen: boolean
 				/** @deprecated */
 				allowPaymentRequest: boolean
 				browsingTopics: boolean
 				credentialless: boolean
-				csp: String
+				csp: string
 				/** @deprecated */
 				frameBorder: string
 				height: string | number
@@ -1309,7 +1309,7 @@ declare global {
 				defaultMuted: boolean
 				defaultPlaybackRate: number
 				disablePictureInPicture: boolean
-				disableRemovePlayback: boolean
+				disableRemotePlayback: boolean
 				height: string | number
 				loop: boolean
 				muted: boolean
@@ -1379,7 +1379,7 @@ declare global {
 			}
 		}
 
-		// HTML ttributes that need to be set with setAttribute
+		// HTML attributes that need to be set with setAttribute
 		// Likely some that are missing
 		interface HTMLAttributes extends HTMLTags {
 			button: {
@@ -1789,7 +1789,7 @@ declare global {
 				viewBox: string
 				width: string | number
 				x: string | number
-				y: StringConstructor
+				y: string | number
 			}
 			text: CommonPresentationAttributes & TextAttributes & {
 				dx: string | number
@@ -1834,7 +1834,7 @@ declare global {
 				viewBox: string
 				preserveAspectRatio: string
 				/** @deprecated */
-				viewTarget: String
+				viewTarget: string
 			}
 		}
 

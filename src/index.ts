@@ -419,6 +419,7 @@ declare global {
 			nonce: string
 			outerText: string
 			outerHTML: string
+			popover: "auto" | "manual" | null
 			scrollLeft: number
 			scrollTop: number
 			slot: string
@@ -428,6 +429,7 @@ declare global {
 			title: string
 			translate: boolean
 			virtualKeyboardPolicy: "auto" | "manual"
+			writingSuggestions: Booleanish
 		}
 		
 		type CommonWritableSVGProps = {
@@ -838,6 +840,7 @@ declare global {
 				allowfullscreen: boolean
 				/** @deprecated */
 				allowPaymentRequest: boolean
+				browsingTopics: boolean
 				credentialless: boolean
 				csp: String
 				/** @deprecated */
@@ -935,7 +938,7 @@ declare global {
 				onchange: (this: HTMLInputElement, ev: Event) => any
 			}
 			ins: {
-				cite: string,
+				cite: string
 				dateTime: string
 			}
 			kbd: {}
@@ -952,7 +955,8 @@ declare global {
 				value: number
 			}
 			link: {
-				as: string,
+				as: string
+				blocking: "render"
 				/** @deprecated */
 				charset: string
 				crossOrigin: "anonymous" | "use-credentials" | ""
@@ -1080,6 +1084,7 @@ declare global {
 			samp: {}
 			script: {
 				async: boolean
+				blocking: "render"
 				crossOrigin: "anonymous" | "use-credentials" | ""
 				/** @deprecated */
 				charset: string
@@ -1129,6 +1134,7 @@ declare global {
 			}
 			strong: {}
 			style: {
+				blocking: "render"
 				media: string
 				/** @deprecated */
 				type: string
@@ -1191,7 +1197,12 @@ declare global {
 				/** @deprecated */
 				width: string
 			}
-			template: {}
+			template: {
+				shadowRootMode: "open" | "closed"
+				shadowRootDelegatesFocus: boolean
+				shadowRootClonable: boolean
+				shadowRootSerializable: boolean
+			}
 			textarea: {
 				autocapitalize: "none" | "off" | "characters" | "words" | "sentences"
 				autocomplete: "on" | "off" | ""

@@ -755,6 +755,12 @@ declare global {
 				type: string
 				width: string | number
 			}
+			fencedframe: {
+				allow: string
+				config: Object
+				height: string | number
+				width: string | number
+			}
 			fieldset: {
 				disabled: boolean
 				name: string
@@ -1066,6 +1072,10 @@ declare global {
 				shadowRootOptions: ShadowRootInit
 			}
 			picture: {}
+			portal: {
+				referrerPolicy: ReferrerPolicy
+				src: string
+			}
 			pre: {
 				/** @depricated */
 				width: number
@@ -1081,6 +1091,7 @@ declare global {
 			rt: {}
 			ruby: {}
 			s: {}
+			search: {}
 			samp: {}
 			script: {
 				async: boolean

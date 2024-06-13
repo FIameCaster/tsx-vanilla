@@ -11,10 +11,12 @@ function element<T extends keyof HTMLTags>(tagName: T, props?: JSX.HTMLElementPr
 function element(tagName: ((props: object) => JSX.Element) | string, props?: { [key: string]: any } | null, ...children: JSX.Children) {
 	if (typeof tagName == "string") {
 		const el = tagMap[tagName]?.(tagName) || document.createElement(tagName)
+		const propChildren = props?.children
+		const shadowRootOptions = props?.shadowRootOptions
 
 		appendChildren(
-			props?.children != null ? [props.children] : children,
-			props?.shadowRootOptions ? el.attachShadow(props.shadowRootOptions) : el
+			propChildren != null ? [propChildren] : children,
+			shadowRootOptions ? el.attachShadow(shadowRootOptions) : el
 		)
 		if (props) {
 			const { attributes, style, dataset, ref } = props
@@ -35,7 +37,7 @@ function element(tagName: ((props: object) => JSX.Element) | string, props?: { [
 
 	let l = children.length
 	// If there are children they need to be passed to the component
-	// If there"s only 1 child, children should not be an array
+	// If there's only 1 child, children should not be an array
 	return tagName(l ? { children: l > 1 ? children : children[0], ...props } : props || {})
 }
 

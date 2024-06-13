@@ -1,5 +1,5 @@
-[![Bundle size](https://badgen.net/bundlephobia/minzip/tsx-vanilla)](https://bundlephobia.com/package/tsx-vanilla)
-[![NPM Package](https://badgen.net/npm/v/tsx-vanilla)](https://npmjs.com/tsx-vanilla)
+[![Bundle size](https://img.shields.io/bundlephobia/minzip/tsx-vanilla?label=size)](https://bundlephobia.com/package/tsx-vanilla)
+[![NPM Package](https://img.shields.io/npm/v/prism-code-editor)](https://npmjs.com/tsx-vanilla)
 
 # tsx-vanilla
 
@@ -137,7 +137,7 @@ All properties that can be set on an element are supported. This includes `textC
 
 SVG support is not enabled by default to reduce bundle size for those who don't need it. To enable SVG support, you must import and call a function before creating any SVG elements with JSX.
 
-```javascript
+```jsx
 import { element, addSVGSupport } from "tsx-vanilla"
 addSVGSupport()
 

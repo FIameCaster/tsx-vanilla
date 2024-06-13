@@ -1,5 +1,5 @@
 [![Bundle size](https://img.shields.io/bundlephobia/minzip/tsx-vanilla?label=size)](https://bundlephobia.com/package/tsx-vanilla)
-[![NPM Package](https://img.shields.io/npm/v/prism-code-editor)](https://npmjs.com/tsx-vanilla)
+[![NPM Package](https://img.shields.io/npm/v/tsx-vanilla)](https://npmjs.com/tsx-vanilla)
 
 # tsx-vanilla
 

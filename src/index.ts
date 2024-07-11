@@ -147,7 +147,10 @@ interface ContentVisibilityAutoStateChangeEvent extends Event {
 	readonly skipped: boolean
 }
 
-type EventHandler<T, E extends Event, TE = Element> = (this: T, ev: E & { currentTarget: T, target: TE }) => void
+// Textareas aren't void tags, but can only have text as children
+type VoidTags = "area" | "base" | "br" | "col" | "embed" | "hr" | "img" | "input" | "link" | "meta" | "source" | "textarea" | "track" | "wbr"
+
+type EventHandler<T, E extends Event, TE = JSX.Element> = (this: T, ev: E & { currentTarget: T, target: TE }) => void
 
 interface ToggleEvent extends Event {
 	readonly newState: "open" | "closed"
@@ -301,9 +304,9 @@ declare global {
 			children?: JSX.Child | JSX.Children
 		}
 
-		type WritableSVGProps<Tag extends keyof SVGTags> = Partial<CommonWritableSVGProps & WritableSVGElementProps[Tag] & EventHandlers<SVGElementTagNameMap[Tag]>>
-		type WritableHTMLProps<Tag extends keyof HTMLTags> = Partial<CommonWritableHTMLProps & WritableElementProps[Tag] & EventHandlers<HTMLElementTagNameMap[Tag]>>
-		type WritableMathMLProps = Partial<CommonWritableMathMLProps & EventHandlers<MathMLElement>>
+		type WritableSVGProps<Tag extends keyof SVGTags> = Partial<CommonWritableSVGProps & WritableSVGElementProps[Tag] & EventHandlers<SVGElementTagNameMap[Tag], Tag>>
+		type WritableHTMLProps<Tag extends keyof HTMLTags> = Partial<CommonWritableHTMLProps & WritableElementProps[Tag] & EventHandlers<HTMLElementTagNameMap[Tag], Tag>>
+		type WritableMathMLProps = Partial<CommonWritableMathMLProps & EventHandlers<MathMLElement, "math">>
 
 		interface AriaAttributes {
 			"aria-atomic": string
@@ -464,78 +467,78 @@ declare global {
 		}
 
 		// Most events that can only be fired on a few different types of elements are removed
-		type EventHandlers<T> = {
-			oncontentvisibilityautostatechange: EventHandler<T, ContentVisibilityAutoStateChangeEvent>
-			onerror: EventHandler<T, ErrorEvent>
-			onload: EventHandler<T, Event>
-			onscroll: EventHandler<T, Event>
-			onscrollend: EventHandler<T, Event>
-			onoverscroll: EventHandler<T, OverscrollEvent>
-			onsecuritypolicyviolation: EventHandler<T, SecurityPolicyViolationEvent>
-			onselect: EventHandler<T, Event>
-			onwheel: EventHandler<T, Event>
-			oncopy: EventHandler<T, ClipboardEvent>
-			oncut: EventHandler<T, ClipboardEvent>
-			onpaste: EventHandler<T, ClipboardEvent>
-			onblur: EventHandler<T, FocusEvent>
-			onfocus: EventHandler<T, FocusEvent>
-			onfocusin: EventHandler<T, FocusEvent>
-			onfocusout: EventHandler<T, FocusEvent>
-			onfullscreenchange: EventHandler<T, Event>
-			onfullscreenerror: EventHandler<T, Event>
-			onkeydown: EventHandler<T, KeyboardEvent>
-			onkeypress: EventHandler<T, KeyboardEvent>
-			onkeyup: EventHandler<T, KeyboardEvent>
-			onauxclick: EventHandler<T, MouseEvent>
-			oncancel: EventHandler<T, Event>
-			onchange: EventHandler<T, Event>
-			onclick: EventHandler<T, MouseEvent>
-			oncontextmenu: EventHandler<T, MouseEvent>
-			ondblclick: EventHandler<T, MouseEvent>
-			onmousedown: EventHandler<T, MouseEvent>
-			onmouseenter: EventHandler<T, MouseEvent>
-			onmouseleave: EventHandler<T, MouseEvent>
-			onmousemove: EventHandler<T, MouseEvent>
-			onmouseout: EventHandler<T, MouseEvent>
-			onmouseover: EventHandler<T, MouseEvent>
-			onmouseup: EventHandler<T, MouseEvent>
-			ontouchcancel: EventHandler<T, TouchEvent>
-			ontouchend: EventHandler<T, TouchEvent>
-			ontouchmove: EventHandler<T, TouchEvent>
-			ontouchstart: EventHandler<T, TouchEvent>
-			onpointerdown: EventHandler<T, PointerEvent>
-			onpointermove: EventHandler<T, PointerEvent>
-			onpointerup: EventHandler<T, PointerEvent>
-			onpointercancel: EventHandler<T, PointerEvent>
-			onpointerover: EventHandler<T, PointerEvent>
-			onpointerout: EventHandler<T, PointerEvent>
-			onpointerenter: EventHandler<T, PointerEvent>
-			onpointerleave: EventHandler<T, PointerEvent>
-			ongotpointercapture: EventHandler<T, PointerEvent>
-			onlostpointercapture: EventHandler<T, PointerEvent>
-			ondrag: EventHandler<T, DragEvent>
-			ondragend: EventHandler<T, DragEvent>
-			ondragenter: EventHandler<T, DragEvent>
-			ondragleave: EventHandler<T, DragEvent>
-			ondragover: EventHandler<T, DragEvent>
-			ondragstart: EventHandler<T, DragEvent>
-			onselectstart: EventHandler<T, Event>
-			onselectionchange: EventHandler<T, Event>
-			oninvalid: EventHandler<T, Event>
+		type EventHandlers<T, E> = {
+			oncontentvisibilityautostatechange: EventHandler<T, ContentVisibilityAutoStateChangeEvent, E extends VoidTags ? T : Element>
+			onerror: EventHandler<T, ErrorEvent, E extends VoidTags ? T : Element>
+			onload: EventHandler<T, Event, E extends VoidTags ? T : Element>
+			onscroll: EventHandler<T, Event, E extends VoidTags ? T : Element>
+			onscrollend: EventHandler<T, Event, E extends VoidTags ? T : Element>
+			onoverscroll: EventHandler<T, OverscrollEvent, E extends VoidTags ? T : Element>
+			onsecuritypolicyviolation: EventHandler<T, SecurityPolicyViolationEvent, E extends VoidTags ? T : Element>
+			onselect: EventHandler<T, Event, E extends VoidTags ? T : Element>
+			onwheel: EventHandler<T, Event, E extends VoidTags ? T : Element>
+			oncopy: EventHandler<T, ClipboardEvent, E extends VoidTags ? T : Element>
+			oncut: EventHandler<T, ClipboardEvent, E extends VoidTags ? T : Element>
+			onpaste: EventHandler<T, ClipboardEvent, E extends VoidTags ? T : Element>
+			onblur: EventHandler<T, FocusEvent & { relatedTarget: Element | null }, E extends VoidTags ? T : Element>
+			onfocus: EventHandler<T, FocusEvent & { relatedTarget: Element | null }, E extends VoidTags ? T : Element>
+			onfocusin: EventHandler<T, FocusEvent & { relatedTarget: Element | null }, E extends VoidTags ? T : Element>
+			onfocusout: EventHandler<T, FocusEvent & { relatedTarget: Element | null }, E extends VoidTags ? T : Element>
+			onfullscreenchange: EventHandler<T, Event, E extends VoidTags ? T : Element>
+			onfullscreenerror: EventHandler<T, Event, E extends VoidTags ? T : Element>
+			onkeydown: EventHandler<T, KeyboardEvent, E extends VoidTags ? T : Element>
+			onkeypress: EventHandler<T, KeyboardEvent, E extends VoidTags ? T : Element>
+			onkeyup: EventHandler<T, KeyboardEvent, E extends VoidTags ? T : Element>
+			onauxclick: EventHandler<T, MouseEvent, E extends VoidTags ? T : Element>
+			oncancel: EventHandler<T, Event, E extends VoidTags ? T : Element>
+			onchange: EventHandler<T, Event, E extends VoidTags ? T : Element>
+			onclick: EventHandler<T, MouseEvent, E extends VoidTags ? T : Element>
+			oncontextmenu: EventHandler<T, MouseEvent, E extends VoidTags ? T : Element>
+			ondblclick: EventHandler<T, MouseEvent, E extends VoidTags ? T : Element>
+			onmousedown: EventHandler<T, MouseEvent, E extends VoidTags ? T : Element>
+			onmouseenter: EventHandler<T, MouseEvent, E extends VoidTags ? T : Element>
+			onmouseleave: EventHandler<T, MouseEvent, E extends VoidTags ? T : Element>
+			onmousemove: EventHandler<T, MouseEvent, E extends VoidTags ? T : Element>
+			onmouseout: EventHandler<T, MouseEvent, E extends VoidTags ? T : Element>
+			onmouseover: EventHandler<T, MouseEvent, E extends VoidTags ? T : Element>
+			onmouseup: EventHandler<T, MouseEvent, E extends VoidTags ? T : Element>
+			ontouchcancel: EventHandler<T, TouchEvent, E extends VoidTags ? T : Element>
+			ontouchend: EventHandler<T, TouchEvent, E extends VoidTags ? T : Element>
+			ontouchmove: EventHandler<T, TouchEvent, E extends VoidTags ? T : Element>
+			ontouchstart: EventHandler<T, TouchEvent, E extends VoidTags ? T : Element>
+			onpointerdown: EventHandler<T, PointerEvent, E extends VoidTags ? T : Element>
+			onpointermove: EventHandler<T, PointerEvent, E extends VoidTags ? T : Element>
+			onpointerup: EventHandler<T, PointerEvent, E extends VoidTags ? T : Element>
+			onpointercancel: EventHandler<T, PointerEvent, E extends VoidTags ? T : Element>
+			onpointerover: EventHandler<T, PointerEvent, E extends VoidTags ? T : Element>
+			onpointerout: EventHandler<T, PointerEvent, E extends VoidTags ? T : Element>
+			onpointerenter: EventHandler<T, PointerEvent, E extends VoidTags ? T : Element>
+			onpointerleave: EventHandler<T, PointerEvent, E extends VoidTags ? T : Element>
+			ongotpointercapture: EventHandler<T, PointerEvent, E extends VoidTags ? T : Element>
+			onlostpointercapture: EventHandler<T, PointerEvent, E extends VoidTags ? T : Element>
+			ondrag: EventHandler<T, DragEvent, E extends VoidTags ? T : Element>
+			ondragend: EventHandler<T, DragEvent, E extends VoidTags ? T : Element>
+			ondragenter: EventHandler<T, DragEvent, E extends VoidTags ? T : Element>
+			ondragleave: EventHandler<T, DragEvent, E extends VoidTags ? T : Element>
+			ondragover: EventHandler<T, DragEvent, E extends VoidTags ? T : Element>
+			ondragstart: EventHandler<T, DragEvent, E extends VoidTags ? T : Element>
+			onselectstart: EventHandler<T, Event, E extends VoidTags ? T : Element>
+			onselectionchange: EventHandler<T, Event, E extends VoidTags ? T : Element>
+			oninvalid: EventHandler<T, Event, E extends VoidTags ? T : Element>
 			/** Warning: Only supported with `addEventListener` in chromium browsers */
-			onanimationcancel: EventHandler<T, AnimationEvent>
-			onanimationend: EventHandler<T, AnimationEvent>
-			onanimationiteration: EventHandler<T, AnimationEvent>
-			onanimationstart: EventHandler<T, AnimationEvent>
-			ontransitionrun: EventHandler<T, TransitionEvent>
-			ontransitionstart: EventHandler<T, TransitionEvent>
-			ontransitionend: EventHandler<T, TransitionEvent>
-			ontransitioncancel: EventHandler<T, TransitionEvent>
-			oninput: EventHandler<T, Event>
-			onbeforeinput: EventHandler<T, InputEvent>
-			onbeforetoggle: EventHandler<T, ToggleEvent>
-			ontoggle: EventHandler<T, ToggleEvent>
-			onbeforematch: EventHandler<T, Event>
+			onanimationcancel: EventHandler<T, AnimationEvent, E extends VoidTags ? T : Element>
+			onanimationend: EventHandler<T, AnimationEvent, E extends VoidTags ? T : Element>
+			onanimationiteration: EventHandler<T, AnimationEvent, E extends VoidTags ? T : Element>
+			onanimationstart: EventHandler<T, AnimationEvent, E extends VoidTags ? T : Element>
+			ontransitionrun: EventHandler<T, TransitionEvent, E extends VoidTags ? T : Element>
+			ontransitionstart: EventHandler<T, TransitionEvent, E extends VoidTags ? T : Element>
+			ontransitionend: EventHandler<T, TransitionEvent, E extends VoidTags ? T : Element>
+			ontransitioncancel: EventHandler<T, TransitionEvent, E extends VoidTags ? T : Element>
+			oninput: EventHandler<T, E extends "textarea" ? InputEvent : Event, E extends VoidTags ? T : Element>
+			onbeforeinput: EventHandler<T, InputEvent, E extends VoidTags ? T : Element>
+			onbeforetoggle: EventHandler<T, ToggleEvent, E extends VoidTags ? T : Element>
+			ontoggle: EventHandler<T, ToggleEvent, E extends VoidTags ? T : Element>
+			onbeforematch: EventHandler<T, Event, E extends VoidTags ? T : Element>
 		}
 
 		// Writable properties specific to a certain element
@@ -1366,27 +1369,27 @@ declare global {
 
 		interface WritableSVGElementProps extends SVGTags {
 			animate: {
-				onbegin: EventHandler<SVGAnimateElement, Event>
-				onend: EventHandler<SVGAnimateElement, Event>
-				onrepeat: EventHandler<SVGAnimateElement, Event>
+				onbegin: EventHandler<SVGAnimateElement, Event, SVGAnimateElement>
+				onend: EventHandler<SVGAnimateElement, Event, SVGAnimateElement>
+				onrepeat: EventHandler<SVGAnimateElement, Event, SVGAnimateElement>
 			}
 			animateMotion: {
-				onbegin: EventHandler<SVGAnimateMotionElement, Event>
-				onend: EventHandler<SVGAnimateMotionElement, Event>
-				onrepeat: EventHandler<SVGAnimateMotionElement, Event>
+				onbegin: EventHandler<SVGAnimateMotionElement, Event, SVGAnimateElement>
+				onend: EventHandler<SVGAnimateMotionElement, Event, SVGAnimateElement>
+				onrepeat: EventHandler<SVGAnimateMotionElement, Event, SVGAnimateElement>
 			}
 			animateTransform: {
-				onbegin: EventHandler<SVGAnimateTransformElement, Event>
-				onend: EventHandler<SVGAnimateTransformElement, Event>
-				onrepeat: EventHandler<SVGAnimateTransformElement, Event>
+				onbegin: EventHandler<SVGAnimateTransformElement, Event, SVGAnimateElement>
+				onend: EventHandler<SVGAnimateTransformElement, Event, SVGAnimateElement>
+				onrepeat: EventHandler<SVGAnimateTransformElement, Event, SVGAnimateElement>
 			}
 			image: {
 				decoding: "auto" | "sync" | "async"
 			}
 			set: {
-				onbegin: EventHandler<SVGAnimateTransformElement, Event>
-				onend: EventHandler<SVGAnimateTransformElement, Event>
-				onrepeat: EventHandler<SVGAnimateTransformElement, Event>
+				onbegin: EventHandler<SVGAnimateTransformElement, Event, SVGAnimateElement>
+				onend: EventHandler<SVGAnimateTransformElement, Event, SVGAnimateElement>
+				onrepeat: EventHandler<SVGAnimateTransformElement, Event, SVGAnimateElement>
 			}
 			svg: {
 				currentScale: number

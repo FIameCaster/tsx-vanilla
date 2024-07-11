@@ -1,6 +1,6 @@
 {
   "name": "tsx-vanilla",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Create DOM elements using JSX with excellent TypeScript support",
   "main": "lib/index.js",
   "types": "lib/index.d.ts",

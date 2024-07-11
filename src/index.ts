@@ -51,7 +51,7 @@ const ref = <T>(value?: T | null) => ({ value })
 
 const addStyles = (style: CSSStyleDeclaration, styles: JSX.CSSProperties) => {
 	for (let name in styles) {
-		if (name.indexOf("--")) style[name] = styles[name]
+		if (name[0] != "-") style[name] = styles[name]
 		else style.setProperty(name, styles[name])
 	}
 }
@@ -97,7 +97,7 @@ const tagMap: Record<string, (tagName: string) => SVGElement | MathMLElement> = 
 const specialProps = new Set(["dataset", "style", "attributes", "ref", "children"])
 
 type CustomProperties = {
-	[key: `--${string}`]: string | null
+	[key: `-${string}`]: string | null
 }
 
 type HTMLTags = {
@@ -146,6 +146,8 @@ interface PictureInPictureEvent extends Event {
 interface ContentVisibilityAutoStateChangeEvent extends Event {
 	readonly skipped: boolean
 }
+
+type EventHandler<T, E extends Event, TE = Element> = (this: T, ev: E & { currentTarget: T, target: TE }) => void
 
 interface ToggleEvent extends Event {
 	readonly newState: "open" | "closed"
@@ -463,75 +465,77 @@ declare global {
 
 		// Most events that can only be fired on a few different types of elements are removed
 		type EventHandlers<T> = {
-			oncontentvisibilityautostatechange: (this: T, ev: ContentVisibilityAutoStateChangeEvent) => any
-			onerror: (this: T, ev: ErrorEvent) => any
-			onload: (this: T, ev: Event) => any
-			onscroll: (this: T, ev: Event) => any
-			onscrollend: (this: T, ev: Event) => any
-			onoverscroll: (this: T, ev: OverscrollEvent) => any
-			onsecuritypolicyviolation: (this: T, ev: SecurityPolicyViolationEvent) => any
-			onselect: (this: T, ev: Event) => any
-			onwheel: (this: T, ev: Event) => any
-			oncopy: (this: T, ev: ClipboardEvent) => any
-			oncut: (this: T, ev: ClipboardEvent) => any
-			onpaste: (this: T, ev: ClipboardEvent) => any
-			onblur: (this: T, ev: FocusEvent) => any
-			onfocus: (this: T, ev: FocusEvent) => any
-			onfocusin: (this: T, ev: FocusEvent) => any
-			onfocusout: (this: T, ev: FocusEvent) => any
-			onfullscreenchange: (this: T, ev: Event) => any
-			onfullscreenerror: (this: T, ev: Event) => any
-			onkeydown: (this: T, ev: KeyboardEvent) => any
-			onkeypress: (this: T, ev: KeyboardEvent) => any
-			onkeyup: (this: T, ev: KeyboardEvent) => any
-			onauxclick: (this: T, ev: MouseEvent) => any
-			onclick: (this: T, ev: MouseEvent) => any
-			oncontextmenu: (this: T, ev: MouseEvent) => any
-			ondblclick: (this: T, ev: MouseEvent) => any
-			onmousedown: (this: T, ev: MouseEvent) => any
-			onmouseenter: (this: T, ev: MouseEvent) => any
-			onmouseleave: (this: T, ev: MouseEvent) => any
-			onmousemove: (this: T, ev: MouseEvent) => any
-			onmouseout: (this: T, ev: MouseEvent) => any
-			onmouseover: (this: T, ev: MouseEvent) => any
-			onmouseup: (this: T, ev: MouseEvent) => any
-			ontouchcancel: (this: T, ev: TouchEvent) => any
-			ontouchend: (this: T, ev: TouchEvent) => any
-			ontouchmove: (this: T, ev: TouchEvent) => any
-			ontouchstart: (this: T, ev: TouchEvent) => any
-			onpointerdown: (this: T, ev: PointerEvent) => any
-			onpointermove: (this: T, ev: PointerEvent) => any
-			onpointerup: (this: T, ev: PointerEvent) => any
-			onpointercancel: (this: T, ev: PointerEvent) => any
-			onpointerover: (this: T, ev: PointerEvent) => any
-			onpointerout: (this: T, ev: PointerEvent) => any
-			onpointerenter: (this: T, ev: PointerEvent) => any
-			onpointerleave: (this: T, ev: PointerEvent) => any
-			ongotpointercapture: (this: T, ev: PointerEvent) => any
-			onlostpointercapture: (this: T, ev: PointerEvent) => any
-			ondrag: (this: T, ev: DragEvent) => any
-			ondragend: (this: T, ev: DragEvent) => any
-			ondragenter: (this: T, ev: DragEvent) => any
-			ondragleave: (this: T, ev: DragEvent) => any
-			ondragover: (this: T, ev: DragEvent) => any
-			ondragstart: (this: T, ev: DragEvent) => any
-			onselectstart: (this: T, ev: Event) => any
-			onselectionchange: (this: T, ev: Event) => any
-			oninvalid: (this: T, ev: Event) => any
+			oncontentvisibilityautostatechange: EventHandler<T, ContentVisibilityAutoStateChangeEvent>
+			onerror: EventHandler<T, ErrorEvent>
+			onload: EventHandler<T, Event>
+			onscroll: EventHandler<T, Event>
+			onscrollend: EventHandler<T, Event>
+			onoverscroll: EventHandler<T, OverscrollEvent>
+			onsecuritypolicyviolation: EventHandler<T, SecurityPolicyViolationEvent>
+			onselect: EventHandler<T, Event>
+			onwheel: EventHandler<T, Event>
+			oncopy: EventHandler<T, ClipboardEvent>
+			oncut: EventHandler<T, ClipboardEvent>
+			onpaste: EventHandler<T, ClipboardEvent>
+			onblur: EventHandler<T, FocusEvent>
+			onfocus: EventHandler<T, FocusEvent>
+			onfocusin: EventHandler<T, FocusEvent>
+			onfocusout: EventHandler<T, FocusEvent>
+			onfullscreenchange: EventHandler<T, Event>
+			onfullscreenerror: EventHandler<T, Event>
+			onkeydown: EventHandler<T, KeyboardEvent>
+			onkeypress: EventHandler<T, KeyboardEvent>
+			onkeyup: EventHandler<T, KeyboardEvent>
+			onauxclick: EventHandler<T, MouseEvent>
+			oncancel: EventHandler<T, Event>
+			onchange: EventHandler<T, Event>
+			onclick: EventHandler<T, MouseEvent>
+			oncontextmenu: EventHandler<T, MouseEvent>
+			ondblclick: EventHandler<T, MouseEvent>
+			onmousedown: EventHandler<T, MouseEvent>
+			onmouseenter: EventHandler<T, MouseEvent>
+			onmouseleave: EventHandler<T, MouseEvent>
+			onmousemove: EventHandler<T, MouseEvent>
+			onmouseout: EventHandler<T, MouseEvent>
+			onmouseover: EventHandler<T, MouseEvent>
+			onmouseup: EventHandler<T, MouseEvent>
+			ontouchcancel: EventHandler<T, TouchEvent>
+			ontouchend: EventHandler<T, TouchEvent>
+			ontouchmove: EventHandler<T, TouchEvent>
+			ontouchstart: EventHandler<T, TouchEvent>
+			onpointerdown: EventHandler<T, PointerEvent>
+			onpointermove: EventHandler<T, PointerEvent>
+			onpointerup: EventHandler<T, PointerEvent>
+			onpointercancel: EventHandler<T, PointerEvent>
+			onpointerover: EventHandler<T, PointerEvent>
+			onpointerout: EventHandler<T, PointerEvent>
+			onpointerenter: EventHandler<T, PointerEvent>
+			onpointerleave: EventHandler<T, PointerEvent>
+			ongotpointercapture: EventHandler<T, PointerEvent>
+			onlostpointercapture: EventHandler<T, PointerEvent>
+			ondrag: EventHandler<T, DragEvent>
+			ondragend: EventHandler<T, DragEvent>
+			ondragenter: EventHandler<T, DragEvent>
+			ondragleave: EventHandler<T, DragEvent>
+			ondragover: EventHandler<T, DragEvent>
+			ondragstart: EventHandler<T, DragEvent>
+			onselectstart: EventHandler<T, Event>
+			onselectionchange: EventHandler<T, Event>
+			oninvalid: EventHandler<T, Event>
 			/** Warning: Only supported with `addEventListener` in chromium browsers */
-			onanimationcancel: (this: T, ev: AnimationEvent) => any
-			onanimationend: (this: T, ev: AnimationEvent) => any
-			onanimationiteration: (this: T, ev: AnimationEvent) => any
-			onanimationstart: (this: T, ev: AnimationEvent) => any
-			ontransitionrun: (this: T, ev: TransitionEvent) => any
-			ontransitionstart: (this: T, ev: TransitionEvent) => any
-			ontransitionend: (this: T, ev: TransitionEvent) => any
-			ontransitioncancel: (this: T, ev: TransitionEvent) => any
-			oninput: (this: T, ev: Event) => any
-			onbeforeinput: (this: T, ev: Event) => any
-			onbeforetoggle: (this: T, ev: ToggleEvent) => any
-			ontoggle: (this: T, ev: ToggleEvent) => any
-			onbeforematch: (this: T, ev: Event) => any
+			onanimationcancel: EventHandler<T, AnimationEvent>
+			onanimationend: EventHandler<T, AnimationEvent>
+			onanimationiteration: EventHandler<T, AnimationEvent>
+			onanimationstart: EventHandler<T, AnimationEvent>
+			ontransitionrun: EventHandler<T, TransitionEvent>
+			ontransitionstart: EventHandler<T, TransitionEvent>
+			ontransitionend: EventHandler<T, TransitionEvent>
+			ontransitioncancel: EventHandler<T, TransitionEvent>
+			oninput: EventHandler<T, Event>
+			onbeforeinput: EventHandler<T, InputEvent>
+			onbeforetoggle: EventHandler<T, ToggleEvent>
+			ontoggle: EventHandler<T, ToggleEvent>
+			onbeforematch: EventHandler<T, Event>
 		}
 
 		// Writable properties specific to a certain element
@@ -611,28 +615,28 @@ declare global {
 				src: string
 				srcObject: MediaStream | MediaSource | Blob
 				volume: number
-				onabort: (this: HTMLAudioElement, ev: UIEvent) => any
-				oncanplay: (this: HTMLAudioElement, ev: Event) => any
-				oncanplaythrough: (this: HTMLAudioElement, ev: Event) => any
-				ondurationchange: (this: HTMLAudioElement, ev: Event) => any
-				onemptied: (this: HTMLAudioElement, ev: Event) => any
-				onended: (this: HTMLAudioElement, ev: Event) => any
-				onloadeddata: (this: HTMLAudioElement, ev: Event) => any
-				onloadedmetadata: (this: HTMLAudioElement, ev: Event) => any
-				onloadstart: (this: HTMLAudioElement, ev: Event) => any
-				onpause: (this: HTMLAudioElement, ev: Event) => any
-				onplay: (this: HTMLAudioElement, ev: Event) => any
-				onplaying: (this: HTMLAudioElement, ev: Event) => any
-				onprogress: (this: HTMLAudioElement, ev: ProgressEvent<HTMLAudioElement>) => any
-				onratechange: (this: HTMLAudioElement, ev: Event) => any
-				onseeked: (this: HTMLAudioElement, ev: Event) => any
-				onseeking: (this: HTMLAudioElement, ev: Event) => any
-				onsuspend: (this: HTMLAudioElement, ev: Event) => any
-				ontimeupdate: (this: HTMLAudioElement, ev: Event) => any
-				onvolumechange: (this: HTMLAudioElement, ev: Event) => any
-				onwaiting: (this: HTMLAudioElement, ev: Event) => any
-				onencrypted: (this: HTMLAudioElement, ev: Event) => any
-				onwaitingforkey: (this: HTMLAudioElement, ev: Event) => any
+				onabort: EventHandler<HTMLAudioElement, UIEvent, HTMLAudioElement>
+				oncanplay: EventHandler<HTMLAudioElement, Event, HTMLAudioElement>
+				oncanplaythrough: EventHandler<HTMLAudioElement, Event, HTMLAudioElement>
+				ondurationchange: EventHandler<HTMLAudioElement, Event, HTMLAudioElement>
+				onemptied: EventHandler<HTMLAudioElement, Event, HTMLAudioElement>
+				onended: EventHandler<HTMLAudioElement, Event, HTMLAudioElement>
+				onloadeddata: EventHandler<HTMLAudioElement, Event, HTMLAudioElement>
+				onloadedmetadata: EventHandler<HTMLAudioElement, Event, HTMLAudioElement>
+				onloadstart: EventHandler<HTMLAudioElement, Event, HTMLAudioElement>
+				onpause: EventHandler<HTMLAudioElement, Event, HTMLAudioElement>
+				onplay: EventHandler<HTMLAudioElement, Event, HTMLAudioElement>
+				onplaying: EventHandler<HTMLAudioElement, Event, HTMLAudioElement>
+				onprogress: EventHandler<HTMLAudioElement, ProgressEvent<HTMLAudioElement>, HTMLAudioElement>
+				onratechange: EventHandler<HTMLAudioElement, Event, HTMLAudioElement>
+				onseeked: EventHandler<HTMLAudioElement, Event, HTMLAudioElement>
+				onseeking: EventHandler<HTMLAudioElement, Event, HTMLAudioElement>
+				onsuspend: EventHandler<HTMLAudioElement, Event, HTMLAudioElement>
+				ontimeupdate: EventHandler<HTMLAudioElement, Event, HTMLAudioElement>
+				onvolumechange: EventHandler<HTMLAudioElement, Event, HTMLAudioElement>
+				onwaiting: EventHandler<HTMLAudioElement, Event, HTMLAudioElement>
+				onencrypted: EventHandler<HTMLAudioElement, Event, HTMLAudioElement>
+				onwaitingforkey: EventHandler<HTMLAudioElement, Event, HTMLAudioElement>
 			}
 			b: {}
 			base: {
@@ -682,8 +686,8 @@ declare global {
 				height: string | number
 				width: string | number
 
-				oncontextlost: (this: HTMLCanvasElement, ev: Event) => any
-				oncontextrestored: (this: HTMLCanvasElement, ev: Event) => any
+				oncontextlost: EventHandler<HTMLCanvasElement, Event, HTMLCanvasElement>
+				oncontextrestored: EventHandler<HTMLCanvasElement, Event, HTMLCanvasElement>
 			}
 			caption: {
 				/** @deprecated */
@@ -728,13 +732,12 @@ declare global {
 			}
 			details: {
 				open: boolean
-				ontoggle: (this: HTMLDetailsElement, ev: Event) => any
+				ontoggle: EventHandler<HTMLDetailsElement, Event, HTMLDetailsElement>
 			}
 			dialog: {
 				open: boolean
 				returnValue: string
-				oncancel: (this: HTMLDialogElement, ev: Event) => any
-				onclose: (this: HTMLDialogElement, ev: Event) => any
+				onclose: EventHandler<HTMLDialogElement, Event, HTMLDialogElement>
 			}
 			div: {
 				/** @deprecated */
@@ -783,8 +786,9 @@ declare global {
 				noValidate: boolean
 				rel: "external" | "help" | "license" | "next" | "nofollow" | "noopener" | "noreferrer" | "opener" | "prev" | "search"
 				target: Target
-				onreset: (this: HTMLFormElement, ev: Event) => any
-				onsubmit: (this: HTMLFormElement, ev: SubmitEvent) => any
+				onformdata: EventHandler<HTMLFormElement, FormDataEvent, HTMLFormElement>
+				onreset: EventHandler<HTMLFormElement, Event, HTMLFormElement>
+				onsubmit: EventHandler<HTMLFormElement, SubmitEvent, HTMLFormElement>
 			}
 			h1: {
 				/** @deprecated */
@@ -943,7 +947,6 @@ declare global {
 				selectionDirection: "forward" | "backward" | "none"
 				size: number
 				webkitdirectory: boolean
-				onchange: (this: HTMLInputElement, ev: Event) => any
 			}
 			ins: {
 				cite: string
@@ -1128,11 +1131,10 @@ declare global {
 				selectedIndex: number
 				size: number
 				value: string
-				onchange: (this: HTMLSelectElement, ev: Event) => any
 			}
 			slot: {
 				name: string
-				onslotchange: (this: HTMLSlotElement, ev: Event) => any
+				onslotchange: EventHandler<HTMLSlotElement, Event, HTMLSlotElement>
 			}
 			small: {}
 			source: {
@@ -1235,7 +1237,6 @@ declare global {
 				selectionStart: number
 				value: string
 				wrap: "hard" | "soft"
-				onchange: (this: HTMLTextAreaElement, ev: Event) => any
 			}
 			tfoot: {
 				/** @deprecated */
@@ -1303,7 +1304,7 @@ declare global {
 				srclang: string
 				label: string
 				default: boolean
-				oncuechange: (this: HTMLTrackElement, ev: Event) => any
+				oncuechange: EventHandler<HTMLTrackElement, Event, HTMLTrackElement>
 			}
 			u: {}
 			ul: {
@@ -1334,58 +1335,58 @@ declare global {
 				srcObject: MediaStream | MediaSource | Blob
 				volume: number
 				width: string | number
-				onabort: (this: HTMLVideoElement, ev: UIEvent) => any
-				oncanplay: (this: HTMLVideoElement, ev: Event) => any
-				oncanplaythrough: (this: HTMLVideoElement, ev: Event) => any
-				ondurationchange: (this: HTMLVideoElement, ev: Event) => any
-				onemptied: (this: HTMLVideoElement, ev: Event) => any
-				onended: (this: HTMLVideoElement, ev: Event) => any
-				onloadeddata: (this: HTMLVideoElement, ev: Event) => any
-				onloadedmetadata: (this: HTMLVideoElement, ev: Event) => any
-				onloadstart: (this: HTMLVideoElement, ev: Event) => any
-				onpause: (this: HTMLVideoElement, ev: Event) => any
-				onplay: (this: HTMLVideoElement, ev: Event) => any
-				onplaying: (this: HTMLVideoElement, ev: Event) => any
-				onprogress: (this: HTMLVideoElement, ev: ProgressEvent<HTMLVideoElement>) => any
-				onratechange: (this: HTMLVideoElement, ev: Event) => any
-				onseeked: (this: HTMLVideoElement, ev: Event) => any
-				onseeking: (this: HTMLVideoElement, ev: Event) => any
-				onsuspend: (this: HTMLVideoElement, ev: Event) => any
-				ontimeupdate: (this: HTMLVideoElement, ev: Event) => any
-				onvolumechange: (this: HTMLVideoElement, ev: Event) => any
-				onwaiting: (this: HTMLVideoElement, ev: Event) => any
-				onencrypted: (this: HTMLVideoElement, ev: Event) => any
-				onwaitingforkey: (this: HTMLVideoElement, ev: Event) => any
-				onenterpictureinpicture: (this: HTMLVideoElement, ev: PictureInPictureEvent) => any
-				onleavepictureinpicture: (this: HTMLVideoElement, ev: PictureInPictureEvent) => any
-				onresize: (this: HTMLVideoElement, ev: Event) => any
+				onabort: EventHandler<HTMLVideoElement, UIEvent, HTMLVideoElement>
+				oncanplay: EventHandler<HTMLVideoElement, Event, HTMLVideoElement>
+				oncanplaythrough: EventHandler<HTMLVideoElement, Event, HTMLVideoElement>
+				ondurationchange: EventHandler<HTMLVideoElement, Event, HTMLVideoElement>
+				onemptied: EventHandler<HTMLVideoElement, Event, HTMLVideoElement>
+				onended: EventHandler<HTMLVideoElement, Event, HTMLVideoElement>
+				onloadeddata: EventHandler<HTMLVideoElement, Event, HTMLVideoElement>
+				onloadedmetadata: EventHandler<HTMLVideoElement, Event, HTMLVideoElement>
+				onloadstart: EventHandler<HTMLVideoElement, Event, HTMLVideoElement>
+				onpause: EventHandler<HTMLVideoElement, Event, HTMLVideoElement>
+				onplay: EventHandler<HTMLVideoElement, Event, HTMLVideoElement>
+				onplaying: EventHandler<HTMLVideoElement, Event, HTMLVideoElement>
+				onprogress: EventHandler<HTMLVideoElement, ProgressEvent<HTMLVideoElement>, HTMLVideoElement>
+				onratechange: EventHandler<HTMLVideoElement, Event, HTMLVideoElement>
+				onseeked: EventHandler<HTMLVideoElement, Event, HTMLVideoElement>
+				onseeking: EventHandler<HTMLVideoElement, Event, HTMLVideoElement>
+				onsuspend: EventHandler<HTMLVideoElement, Event, HTMLVideoElement>
+				ontimeupdate: EventHandler<HTMLVideoElement, Event, HTMLVideoElement>
+				onvolumechange: EventHandler<HTMLVideoElement, Event, HTMLVideoElement>
+				onwaiting: EventHandler<HTMLVideoElement, Event, HTMLVideoElement>
+				onencrypted: EventHandler<HTMLVideoElement, Event, HTMLVideoElement>
+				onwaitingforkey: EventHandler<HTMLVideoElement, Event, HTMLVideoElement>
+				onenterpictureinpicture: EventHandler<HTMLVideoElement, PictureInPictureEvent, HTMLVideoElement>
+				onleavepictureinpicture: EventHandler<HTMLVideoElement, PictureInPictureEvent, HTMLVideoElement>
+				onresize: EventHandler<HTMLVideoElement, Event, HTMLVideoElement>
 			}
 			wbr: {}
 		}
 
 		interface WritableSVGElementProps extends SVGTags {
 			animate: {
-				onbegin: (this: SVGAnimateElement, ev: Event) => any
-				onend: (this: SVGAnimateElement, ev: Event) => any
-				onrepeat: (this: SVGAnimateElement, ev: Event) => any
+				onbegin: EventHandler<SVGAnimateElement, Event>
+				onend: EventHandler<SVGAnimateElement, Event>
+				onrepeat: EventHandler<SVGAnimateElement, Event>
 			}
 			animateMotion: {
-				onbegin: (this: SVGAnimateMotionElement, ev: Event) => any
-				onend: (this: SVGAnimateMotionElement, ev: Event) => any
-				onrepeat: (this: SVGAnimateMotionElement, ev: Event) => any
+				onbegin: EventHandler<SVGAnimateMotionElement, Event>
+				onend: EventHandler<SVGAnimateMotionElement, Event>
+				onrepeat: EventHandler<SVGAnimateMotionElement, Event>
 			}
 			animateTransform: {
-				onbegin: (this: SVGAnimateTransformElement, ev: Event) => any
-				onend: (this: SVGAnimateTransformElement, ev: Event) => any
-				onrepeat: (this: SVGAnimateTransformElement, ev: Event) => any
+				onbegin: EventHandler<SVGAnimateTransformElement, Event>
+				onend: EventHandler<SVGAnimateTransformElement, Event>
+				onrepeat: EventHandler<SVGAnimateTransformElement, Event>
 			}
 			image: {
 				decoding: "auto" | "sync" | "async"
 			}
 			set: {
-				onbegin: (this: SVGAnimateTransformElement, ev: Event) => any
-				onend: (this: SVGAnimateTransformElement, ev: Event) => any
-				onrepeat: (this: SVGAnimateTransformElement, ev: Event) => any
+				onbegin: EventHandler<SVGAnimateTransformElement, Event>
+				onend: EventHandler<SVGAnimateTransformElement, Event>
+				onrepeat: EventHandler<SVGAnimateTransformElement, Event>
 			}
 			svg: {
 				currentScale: number

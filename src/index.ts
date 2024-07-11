@@ -86,9 +86,9 @@ const addMathMLSupport = () => {
 	let fn = (tagName: string) => document.createElementNS("http://www.w3.org/1998/Math/MathML", tagName);
 	[
 		"annotation", "annotation-xml", "maction", "math", "merror", "mfrac", "mi",
-    "mmultiscripts", "mn", "mo", "mover", "mpadded", "mphantom", "mprescripts",
-    "mroot", "mrow", "ms", "mspace", "msqrt", "mstyle", "msub", "msubsup", "msup",
-    "mtable", "mtd", "mtext", "mtr", "munder", "munderover", "semantics"
+		"mmultiscripts", "mn", "mo", "mover", "mpadded", "mphantom", "mprescripts",
+		"mroot", "mrow", "ms", "mspace", "msqrt", "mstyle", "msub", "msubsup", "msup",
+		"mtable", "mtd", "mtext", "mtr", "munder", "munderover", "semantics"
 	].forEach(tag => tagMap[tag] = fn)
 }
 
@@ -297,7 +297,7 @@ declare global {
 		}
 
 		type MathMLElementProps<T extends keyof MathMLTags> = WritableMathMLProps & {
-			attributes?: Partial<AriaAttributes & GlobalHTMLAttributes & MathMLAttributes[T]>,
+			attributes?: Partial<AriaAttributes & GlobalMathMLAttributes & MathMLAttributes[T]>,
 			style?: JSX.CSSProperties | string,
 			dataset?: { [key: string]: string | number | boolean }
 			ref?: ReturnType<typeof ref<MathMLElement>> | ((el: MathMLElement) => any)
@@ -335,7 +335,7 @@ declare global {
 			"aria-pos-in-set": number
 			"aria-pressed": Booleanish | "mixed"
 			"aria-read-only": Booleanish
-			"aria-relevant":  "additions" | "all" | "removals" | "text" | "additions text"
+			"aria-relevant": "additions" | "all" | "removals" | "text" | "additions text"
 			"aria-required": Booleanish
 			"aria-role-description": string
 			"aria-row-count": number
